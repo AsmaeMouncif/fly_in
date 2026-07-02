@@ -1,5 +1,5 @@
 import sys
-from parser import Parser
+from parser import Parser, ParserError
 
 
 def main():
@@ -8,7 +8,12 @@ def main():
         sys.exit(1)
 
     parser = Parser(sys.argv[1])
-    parser.parse_file()
+
+    try:
+        parser.parse_file()
+    except ParserError as e:
+        print(e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
