@@ -1,28 +1,15 @@
-from tkinter import Tk, Label
-from PIL import Image, ImageTk
-import os
+import sys
+from parser import Parser
 
-root = Tk()
-root.title("fly-in")
-root.geometry("800x600")
 
-root.bind("<Escape>", lambda e: root.destroy())
+def main():
+    if len(sys.argv) != 2:
+        print("Please use: 'make run FILE=<path_to_file>'")
+        sys.exit(1)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-img_path = os.path.join(BASE_DIR, "..", "assets", "background.png")
+    parser = Parser(sys.argv[1])
+    parser.parse_file()
 
-screen_w = root.winfo_screenwidth()
-screen_h = root.winfo_screenheight()
 
-img = Image.open(img_path)
-
-img = img.resize((screen_w, screen_h), Image.Resampling.LANCZOS)
-
-photo = ImageTk.PhotoImage(img)
-
-label = Label(root, image=photo)
-label.place(x=0, y=0, relwidth=1, relheight=1)
-
-label.image = photo
-
-root.mainloop()
+if __name__ == "__main__":
+    main()
