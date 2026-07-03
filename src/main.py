@@ -8,7 +8,6 @@ def main():
         sys.exit(1)
 
     parser = Parser(sys.argv[1])
-
     try:
         parser.parse_file()
     except ParserError as e:
