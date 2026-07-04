@@ -59,7 +59,7 @@ class Parser:
         metadata = None
         if "[" in data:
             zone_data, metadata = data.split("[", 1)
-            metadata = metadata.strip("]")
+            metadata = metadata.strip().rstrip("]")
         else:
             zone_data = data
         zone_data = zone_data.strip().split()
