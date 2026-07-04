@@ -72,7 +72,7 @@ class Parser:
         if metadata is not None:
             self.parse_zone_metadata(metadata)
         self.start_hub_defined = True
-        
+
     def parse_end_hub(self, line):
         if self.end_hub_defined:
             raise ParserError("end_hub defined multiple times")
@@ -153,20 +153,37 @@ class Parser:
         return x, y
 
     def parse_zone_metadata(self, metadata):
-        if not metadata.startswith("[") or not metadata.endswith("]"):
-            raise ParserError(f"Invalid metadata block: {metadata}")
-        content = metadata[1:-1]
-        metadata_names = ["zone=", "color=", "max_drones="]
+        allowed_names = ["zone", "color", "max_drones"]
+        metadata = metadata.split()
+        for part in metadata:
+            if "=" not in part:
+                raise ParserError("Invalid metadata format")
+            name, value = part.split("=", 1)
+            if name not in allowed_names:
+                raise ParserError(f"Unknown metadata: {name}")
+            if name == "zone":
+                allowed_types = ["normal", "blocked", "restricted", "priority"]
+                if value not in allowed_types:
+                    raise ParserError(f"Invalid zone type: {value}")
+            elif name == "color":
+                self.validate_color(value)
+            elif name == "max_drones":
+                try:
+                    value = int(value)
+                except ValueError:
+                    raise ParserError("Invalid max_drones value")
+                if value <= 0:
+                    raise ParserError("Invalid max_drones value")
 
     def parse_connection_metadata(self, metadata):
         if not metadata.startswith("[") or not metadata.endswith("]"):
             raise ParserError(f"Invalid metadata block: {metadata}")
         content = metadata[1:-1]
         if "max_link_capacity=" not in content:
-            raise ParserError("Invalid connection metadata")
+            raise ParserError("Invalid metadata format")
         parts = content.split("=")
         if len(parts) != 2:
-            raise ParserError("Invalid connection metadata")
+            raise ParserError("Invalid metadata format")
         max_link_capacity = parts[1]
         try:
             max_link_capacity = int(max_link_capacity)
