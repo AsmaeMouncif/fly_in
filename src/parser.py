@@ -65,7 +65,7 @@ class Parser:
         if len(parts) == 4:
             self.validate_zone_name(parts[0])
             x, y = self.validate_coordinates(parts[1], parts[2])
-            self.parse_metadata(parts[3])
+            self.parse_zone_metadata(parts[3])
         self.start_hub_defined = True
 
     def parse_end_hub(self, line):
@@ -84,7 +84,7 @@ class Parser:
         if len(parts) == 4:
             self.validate_zone_name(parts[0])
             x, y = self.validate_coordinates(parts[1], parts[2])
-            self.parse_metadata(parts[3])
+            self.parse_zone_metadata(parts[3])
         self.end_hub_defined = True
 
     def parse_hub(self, line):
@@ -101,7 +101,7 @@ class Parser:
         if len(parts) == 4:
             self.validate_zone_name(parts[0])
             x, y = self.validate_coordinates(parts[1], parts[2])
-            self.parse_metadata(parts[3])
+            self.parse_zone_metadata(parts[3])
 
     def parse_connection(self, line):
         parts = line.split(":", 1)
@@ -122,7 +122,7 @@ class Parser:
         if zone1 == zone2:
             raise ParserError("A zone cannot connect to itself")
         if len(parts) == 2:
-            self.parse_metadata(parts[1])
+            self.parse_connection_metadata(parts[1])
 
     def validate_zone_name(self, name):
         if "-" in name:
@@ -136,5 +136,13 @@ class Parser:
             raise ParserError("Invalid coordinate values")
         return x, y
 
-    def parse_metadata(self, metadata):
+    def parse_zone_metadata(self, metadata):
         pass
+    
+    def parse_connection_metadata(self, metadata):
+        if not metadata.startswith("[") or not metadata.endswith("]"):
+            raise ParserError(f"Invalid metadata block: {metadata}")
+        content = metadata[1:-1]
+        if "max_link_capacity=" not in content:
+            raise ParserError("Invalid connection metadata")
+        
