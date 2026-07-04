@@ -59,56 +59,64 @@ class Parser:
         metadata = None
         if "[" in data:
             zone_data, metadata = data.split("[", 1)
+            if not metadata.strip().endswith("]"):
+                raise ParserError("Invalid metadata format")
             metadata = metadata.strip().rstrip("]")
         else:
             zone_data = data
         zone_data = zone_data.strip().split()
-        # if len(zone_data) != 3:
-        #     raise ParserError("Invalid start_hub format")
-        # print(metadata)
-        # if len(zone_data) == 3:
-        #     self.validate_zone_name(zone_data[0])
-        #     x, y = self.validate_coordinates(zone_data[1], zone_data[2])
-        # if len(parts) == 4:
-        #     self.validate_zone_name(parts[0])
-        #     x, y = self.validate_coordinates(parts[1], parts[2])
-        #     self.parse_zone_metadata(parts[3])
+        if len(zone_data) != 3:
+            raise ParserError("Invalid start_hub format")
+        self.validate_zone_name(zone_data[0])
+        x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        if metadata is not None:
+            self.parse_zone_metadata(metadata)
         self.start_hub_defined = True
-
+        
     def parse_end_hub(self, line):
         if self.end_hub_defined:
             raise ParserError("end_hub defined multiple times")
         parts = line.split(":", 1)
-        if len(parts) != 2:
+        if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid end_hub format")
         data = parts[1].strip()
-        parts = data.split()
-        if len(parts) not in (3, 4):
-            raise ParserError("Invalid end_hub format")
-        if len(parts) == 3:
-            self.validate_zone_name(parts[0])
-            x, y = self.validate_coordinates(parts[1], parts[2])
-        if len(parts) == 4:
-            self.validate_zone_name(parts[0])
-            x, y = self.validate_coordinates(parts[1], parts[2])
-            self.parse_zone_metadata(parts[3])
+        metadata = None
+        if "[" in data:
+            zone_data, metadata = data.split("[", 1)
+            if not metadata.strip().endswith("]"):
+                raise ParserError("Invalid metadata format")
+            metadata = metadata.strip().rstrip("]")
+        else:
+            zone_data = data
+        zone_data = zone_data.strip().split()
+        if len(zone_data) != 3:
+            raise ParserError("Invalid start_hub format")
+        self.validate_zone_name(zone_data[0])
+        x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        if metadata is not None:
+            self.parse_zone_metadata(metadata)
         self.end_hub_defined = True
 
     def parse_hub(self, line):
         parts = line.split(":", 1)
-        if len(parts) != 2:
+        if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid hub format")
         data = parts[1].strip()
-        parts = data.split()
-        if len(parts) not in (3, 4):
+        metadata = None
+        if "[" in data:
+            zone_data, metadata = data.split("[", 1)
+            if not metadata.strip().endswith("]"):
+                raise ParserError("Invalid metadata format")
+            metadata = metadata.strip().rstrip("]")
+        else:
+            zone_data = data
+        zone_data = zone_data.strip().split()
+        if len(zone_data) != 3:
             raise ParserError("Invalid hub format")
-        if len(parts) == 3:
-            self.validate_zone_name(parts[0])
-            x, y = self.validate_coordinates(parts[1], parts[2])
-        if len(parts) == 4:
-            self.validate_zone_name(parts[0])
-            x, y = self.validate_coordinates(parts[1], parts[2])
-            self.parse_zone_metadata(parts[3])
+        self.validate_zone_name(zone_data[0])
+        x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        if metadata is not None:
+            self.parse_zone_metadata(metadata)
 
     def parse_connection(self, line):
         max_link_capacity = 1
