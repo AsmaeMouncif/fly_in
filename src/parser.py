@@ -145,4 +145,5 @@ class Parser:
         content = metadata[1:-1]
         if "max_link_capacity=" not in content:
             raise ParserError("Invalid connection metadata")
-        
+        parts = metadata.split("=")
+        print(parts)
