@@ -53,19 +53,26 @@ class Parser:
         if self.start_hub_defined:
             raise ParserError("start_hub defined multiple times")
         parts = line.split(":", 1)
-        if len(parts) != 2:
+        if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid start_hub format")
         data = parts[1].strip()
-        parts = data.split()
-        if len(parts) not in (3, 4):
-            raise ParserError("Invalid start_hub format")
-        if len(parts) == 3:
-            self.validate_zone_name(parts[0])
-            x, y = self.validate_coordinates(parts[1], parts[2])
-        if len(parts) == 4:
-            self.validate_zone_name(parts[0])
-            x, y = self.validate_coordinates(parts[1], parts[2])
-            self.parse_zone_metadata(parts[3])
+        metadata = None
+        if "[" in data:
+            zone_data, metadata = data.split("[", 1)
+            metadata = metadata.strip("]")
+        else:
+            zone_data = data
+        zone_data = zone_data.strip().split()
+        # if len(zone_data) != 3:
+        #     raise ParserError("Invalid start_hub format")
+        # print(metadata)
+        # if len(zone_data) == 3:
+        #     self.validate_zone_name(zone_data[0])
+        #     x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        # if len(parts) == 4:
+        #     self.validate_zone_name(parts[0])
+        #     x, y = self.validate_coordinates(parts[1], parts[2])
+        #     self.parse_zone_metadata(parts[3])
         self.start_hub_defined = True
 
     def parse_end_hub(self, line):
