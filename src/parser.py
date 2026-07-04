@@ -104,6 +104,7 @@ class Parser:
             self.parse_zone_metadata(parts[3])
 
     def parse_connection(self, line):
+        max_link_capacity = 1
         parts = line.split(":", 1)
         if len(parts) != 2:
             raise ParserError("Invalid connection format")
@@ -122,7 +123,7 @@ class Parser:
         if zone1 == zone2:
             raise ParserError("A zone cannot connect to itself")
         if len(parts) == 2:
-            self.parse_connection_metadata(parts[1])
+            max_link_capacity = self.parse_connection_metadata(parts[1])
 
     def validate_zone_name(self, name):
         if "-" in name:
@@ -137,13 +138,25 @@ class Parser:
         return x, y
 
     def parse_zone_metadata(self, metadata):
-        pass
-    
+        if not metadata.startswith("[") or not metadata.endswith("]"):
+            raise ParserError(f"Invalid metadata block: {metadata}")
+        content = metadata[1:-1]
+        metadata_names = ["zone=", "color=", "max_drones="]
+
     def parse_connection_metadata(self, metadata):
         if not metadata.startswith("[") or not metadata.endswith("]"):
             raise ParserError(f"Invalid metadata block: {metadata}")
         content = metadata[1:-1]
         if "max_link_capacity=" not in content:
             raise ParserError("Invalid connection metadata")
-        parts = metadata.split("=")
-        print(parts)
+        parts = content.split("=")
+        if len(parts) != 2:
+            raise ParserError("Invalid connection metadata")
+        max_link_capacity = parts[1]
+        try:
+            max_link_capacity = int(max_link_capacity)
+        except ValueError:
+            raise ParserError("Invalid max_link_capacity value")
+        if max_link_capacity <= 0:
+            raise ParserError("Invalid max_link_capacity value")
+        return max_link_capacity
