@@ -8,6 +8,8 @@ class Parser:
         self.nb_drones_defined = False
         self.start_hub_defined = False
         self.end_hub_defined = False
+        self.zones = set()
+        self.connections = set()
 
     def parse_file(self):
         try:
@@ -143,6 +145,9 @@ class Parser:
     def validate_zone_name(self, name):
         if "-" in name:
             raise ParserError("Zone name cannot contain dashes")
+        if name in self.zones:
+            raise ParserError(f"Zone name already used: {name}")
+        self.zones.add(name)
 
     def validate_coordinates(self, x, y):
         try:
