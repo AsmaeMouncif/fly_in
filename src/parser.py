@@ -1,16 +1,5 @@
 import pygame
-
-DEFAULT_COLOR = "white"
-
-
-class Zone:
-    def __init__(self, name, x, y):
-        self.name = name
-        self.x = x
-        self.y = y
-        self.zone_type = "normal"
-        self.color = DEFAULT_COLOR
-        self.max_drones = 1
+from zone import Zone, DEFAULT_COLOR
 
 
 class ParserError(Exception):
@@ -38,6 +27,14 @@ class Parser:
                     lines.append(line)
         except FileNotFoundError:
             raise ParserError(f"File not found: {self.file_path}")
+        except PermissionError:
+            raise ParserError(f"Permission denied: {self.file_path}")
+        except IsADirectoryError:
+            raise ParserError(f"Expected a file, got a directory: {self.file_path}")
+        except OSError as e:
+            raise ParserError(f"Cannot read file {self.file_path}: {e}")
+        if not lines:
+            raise ParserError(f"Empty file: {self.file_path}")
         self.check_required_fields_present(lines)
         for line in lines:
             self.parse_line(line)
@@ -212,6 +209,7 @@ class Parser:
 
     def parse_zone_metadata(self, zone, metadata):
         allowed_names = ["zone", "color", "max_drones"]
+        seen_names = set()
         metadata = metadata.split()
         for part in metadata:
             if "=" not in part:
