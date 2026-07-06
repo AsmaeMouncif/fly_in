@@ -14,13 +14,34 @@ class Parser:
     def parse_file(self):
         try:
             with open(self.file_path, "r") as file:
+                lines = []
                 for line in file:
                     line = line.strip()
                     if not line or line.startswith("#"):
                         continue
-                    self.parse_line(line)
+                    lines.append(line)
         except FileNotFoundError:
             raise ParserError(f"File not found: {self.file_path}")
+        zone_lines = []
+        connection_lines = []
+        for line in lines:
+            if line.startswith("connection:"):
+                connection_lines.append(line)
+            else:
+                zone_lines.append(line)
+        for line in zone_lines:
+            self.parse_line(line)
+        self.validate_required_fields()
+        for line in connection_lines:
+            self.parse_connection(line)
+
+    def validate_required_fields(self):
+        if not self.nb_drones_defined:
+            raise ParserError("Missing nb_drones definition")
+        if not self.start_hub_defined:
+            raise ParserError("Missing start_hub definition")
+        if not self.end_hub_defined:
+            raise ParserError("Missing end_hub definition")
 
     def parse_line(self, line):
         if line.startswith("nb_drones:"):
@@ -32,7 +53,7 @@ class Parser:
         elif line.startswith("hub:"):
             self.parse_hub(line)
         elif line.startswith("connection:"):
-            self.parse_connection(line)
+            pass
         else:
             raise ParserError(f"Unknown line: {line}")
 
@@ -92,7 +113,7 @@ class Parser:
             zone_data = data
         zone_data = zone_data.strip().split()
         if len(zone_data) != 3:
-            raise ParserError("Invalid start_hub format")
+            raise ParserError("Invalid end_hub format")
         self.validate_zone_name(zone_data[0])
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
         if metadata is not None:
@@ -179,7 +200,7 @@ class Parser:
                 if value not in allowed_types:
                     raise ParserError(f"Invalid zone type: {value}")
             elif name == "color":
-                self.validate_color(value)
+                pass
             elif name == "max_drones":
                 try:
                     value = int(value)
