@@ -1,3 +1,18 @@
+import pygame
+
+DEFAULT_COLOR = "white"
+
+
+class Zone:
+    def __init__(self, name, x, y):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.zone_type = "normal"
+        self.color = DEFAULT_COLOR
+        self.max_drones = 1
+
+
 class ParserError(Exception):
     pass
 
@@ -9,6 +24,7 @@ class Parser:
         self.start_hub_defined = False
         self.end_hub_defined = False
         self.zones = set()
+        self.zone_objects = {}
         self.connections = set()
 
     def parse_file(self):
@@ -93,8 +109,10 @@ class Parser:
             raise ParserError("Invalid start_hub format")
         self.validate_zone_name(zone_data[0])
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        zone = Zone(zone_data[0], x, y)
+        self.zone_objects[zone.name] = zone
         if metadata is not None:
-            self.parse_zone_metadata(metadata)
+            self.parse_zone_metadata(zone, metadata)
         self.start_hub_defined = True
 
     def parse_end_hub(self, line):
@@ -117,8 +135,10 @@ class Parser:
             raise ParserError("Invalid end_hub format")
         self.validate_zone_name(zone_data[0])
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        zone = Zone(zone_data[0], x, y)
+        self.zone_objects[zone.name] = zone
         if metadata is not None:
-            self.parse_zone_metadata(metadata)
+            self.parse_zone_metadata(zone, metadata)
         self.end_hub_defined = True
 
     def parse_hub(self, line):
@@ -139,9 +159,10 @@ class Parser:
             raise ParserError("Invalid hub format")
         self.validate_zone_name(zone_data[0])
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
+        zone = Zone(zone_data[0], x, y)
+        self.zone_objects[zone.name] = zone
         if metadata is not None:
-            self.parse_zone_metadata(metadata)
-
+            self.parse_zone_metadata(zone, metadata)
     def parse_connection(self, line):
         max_link_capacity = 1
         parts = line.split(":", 1)
@@ -189,7 +210,7 @@ class Parser:
             raise ParserError("Invalid coordinate values")
         return x, y
 
-    def parse_zone_metadata(self, metadata):
+    def parse_zone_metadata(self, zone, metadata):
         allowed_names = ["zone", "color", "max_drones"]
         metadata = metadata.split()
         for part in metadata:
@@ -202,8 +223,10 @@ class Parser:
                 allowed_types = ["normal", "blocked", "restricted", "priority"]
                 if value not in allowed_types:
                     raise ParserError(f"Invalid zone type: {value}")
+                zone.zone_type = value
             elif name == "color":
-                pass
+                zone.color = self.resolve_color(value)
+                print(f"Zone {zone.name} -> color = {zone.color}")
             elif name == "max_drones":
                 try:
                     value = int(value)
@@ -211,6 +234,7 @@ class Parser:
                     raise ParserError("Invalid max_drones value")
                 if value <= 0:
                     raise ParserError("Invalid max_drones value")
+                zone.max_drones = value
 
     def parse_connection_metadata(self, metadata):
         if not metadata.startswith("[") or not metadata.endswith("]"):
@@ -229,3 +253,10 @@ class Parser:
         if max_link_capacity <= 0:
             raise ParserError("Invalid max_link_capacity value")
         return max_link_capacity
+
+    def resolve_color(self, value):
+        try:
+            pygame.Color(value)
+        except ValueError:
+            return DEFAULT_COLOR
+        return value
