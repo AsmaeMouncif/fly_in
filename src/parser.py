@@ -22,25 +22,26 @@ class Parser:
                     lines.append(line)
         except FileNotFoundError:
             raise ParserError(f"File not found: {self.file_path}")
-        zone_lines = []
-        connection_lines = []
+        self.check_required_fields_present(lines)
         for line in lines:
-            if line.startswith("connection:"):
-                connection_lines.append(line)
-            else:
-                zone_lines.append(line)
-        for line in zone_lines:
             self.parse_line(line)
-        self.validate_required_fields()
-        for line in connection_lines:
-            self.parse_connection(line)
 
-    def validate_required_fields(self):
-        if not self.nb_drones_defined:
+    def check_required_fields_present(self, lines):
+        has_nb_drones = False
+        has_start_hub = False
+        has_end_hub = False
+        for line in lines:
+            if line.startswith("nb_drones:"):
+                has_nb_drones = True
+            if line.startswith("start_hub:"):
+                has_start_hub = True
+            if line.startswith("end_hub:"):
+                has_end_hub = True
+        if not has_nb_drones:
             raise ParserError("Missing nb_drones definition")
-        if not self.start_hub_defined:
+        if not has_start_hub:
             raise ParserError("Missing start_hub definition")
-        if not self.end_hub_defined:
+        if not has_end_hub:
             raise ParserError("Missing end_hub definition")
 
     def parse_line(self, line):
@@ -53,7 +54,7 @@ class Parser:
         elif line.startswith("hub:"):
             self.parse_hub(line)
         elif line.startswith("connection:"):
-            pass
+            self.parse_connection(line)
         else:
             raise ParserError(f"Unknown line: {line}")
 
@@ -174,6 +175,8 @@ class Parser:
     def validate_zone_name(self, name):
         if "-" in name:
             raise ParserError("Zone name cannot contain dashes")
+        if " " in name:
+            raise ParserError("Zone name cannot contain spaces")
         if name in self.zones:
             raise ParserError(f"Zone name already used: {name}")
         self.zones.add(name)
