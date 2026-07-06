@@ -139,6 +139,14 @@ class Parser:
             raise ParserError("Invalid connection format")
         if zone1 == zone2:
             raise ParserError("A zone cannot connect to itself")
+        if zone1 not in self.zones:
+            raise ParserError(f"Unknown zone: {zone1}")
+        if zone2 not in self.zones:
+            raise ParserError(f"Unknown zone: {zone2}")
+        connection_key = frozenset((zone1, zone2))
+        if connection_key in self.connections:
+            raise ParserError(f"Duplicate connection: {zone1}-{zone2}")
+        self.connections.add(connection_key)
         if len(parts) == 2:
             max_link_capacity = self.parse_connection_metadata(parts[1])
 
