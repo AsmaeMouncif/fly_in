@@ -47,7 +47,7 @@ class Parser:
         first_line_number, first_content = lines[0]
         if not first_content.startswith("nb_drones:"):
             raise ParserError(
-                f"Line {first_line_number}: nb_drones must be the first line of the file"
+                f"Line {first_line_number} nb_drones must be the first line of the file"
             )
         contents_only = []
         for line_number, content in lines:
@@ -57,7 +57,7 @@ class Parser:
             try:
                 self.parse_line(content)
             except ParserError as e:
-                raise ParserError(f"Line {line_number}: {e}") from e
+                raise ParserError(f"Line {line_number} {e}") from e
 
     def check_required_fields_present(self, lines):
         has_nb_drones = False
