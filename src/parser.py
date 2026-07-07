@@ -1,3 +1,4 @@
+import re
 import pygame
 from zone import Zone, DEFAULT_COLOR
 
@@ -16,15 +17,23 @@ class Parser:
         self.zone_objects = {}
         self.connections = set()
 
+    @staticmethod
+    def strip_comment(line):
+        line = line.strip()
+        if line.startswith("#"):
+            return ""
+        line = re.split(r"\s+#", line, maxsplit=1)[0]
+        return line.strip()
+
     def parse_file(self):
         try:
             with open(self.file_path, "r") as file:
                 lines = []
-                for line in file:
-                    line = line.strip()
-                    if not line or line.startswith("#"):
+                for line_number, raw_line in enumerate(file, start=1):
+                    content = self.strip_comment(raw_line)
+                    if not content:
                         continue
-                    lines.append(line)
+                    lines.append((line_number, content))
         except FileNotFoundError:
             raise ParserError(f"File not found: {self.file_path}")
         except PermissionError:
@@ -35,9 +44,19 @@ class Parser:
             raise ParserError(f"Cannot read file {self.file_path}: {e}")
         if not lines:
             raise ParserError(f"Empty file: {self.file_path}")
-        self.check_required_fields_present(lines)
-        for line in lines:
-            self.parse_line(line)
+        if not lines[0][1].startswith("nb_drones:"):
+            raise ParserError(
+                f"Line {lines[0][0]}: nb_drones must be the first line of the file"
+            )
+        contents_only = []
+        for line_number, content in lines:
+            contents_only.append(content)
+        self.check_required_fields_present(contents_only)
+        for line_number, content in lines:
+            try:
+                self.parse_line(content)
+            except ParserError as e:
+                raise ParserError(f"Line {line_number}: {e}") from e
 
     def check_required_fields_present(self, lines):
         has_nb_drones = False
@@ -160,6 +179,7 @@ class Parser:
         self.zone_objects[zone.name] = zone
         if metadata is not None:
             self.parse_zone_metadata(zone, metadata)
+
     def parse_connection(self, line):
         max_link_capacity = 1
         parts = line.split(":", 1)
@@ -217,6 +237,9 @@ class Parser:
             name, value = part.split("=", 1)
             if name not in allowed_names:
                 raise ParserError(f"Unknown metadata: {name}")
+            if name in seen_names:
+                raise ParserError(f"Duplicate metadata: {name}")
+            seen_names.add(name)
             if name == "zone":
                 allowed_types = ["normal", "blocked", "restricted", "priority"]
                 if value not in allowed_types:
@@ -224,7 +247,6 @@ class Parser:
                 zone.zone_type = value
             elif name == "color":
                 zone.color = self.resolve_color(value)
-                print(f"Zone {zone.name} -> color = {zone.color}")
             elif name == "max_drones":
                 try:
                     value = int(value)
