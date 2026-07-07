@@ -44,6 +44,7 @@ class Parser:
             raise ParserError(f"Cannot read file {self.file_path}: {e}")
         if not lines:
             raise ParserError(f"Empty file: {self.file_path}")
+        first_line_number, first_content = lines[0]
         if not first_content.startswith("nb_drones:"):
             raise ParserError(
                 f"Line {first_line_number}: nb_drones must be the first line of the file"
