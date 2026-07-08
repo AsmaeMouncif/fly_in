@@ -3,6 +3,8 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import re
 import pygame
 from .zone import Zone, DEFAULT_COLOR
+from .connection import Connection
+from .graph import Graph
 
 
 class ParserError(Exception):
@@ -17,7 +19,8 @@ class Parser:
         self.end_hub_defined = False
         self.zones = set()
         self.zone_objects = {}
-        self.connections = set()
+        self.connections = []
+        self.connection_keys = set()
         self.start_hub_name = None
         self.end_hub_name = None
 
@@ -63,6 +66,15 @@ class Parser:
             except ParserError as e:
                 raise ParserError(f"Line {line_number} {e}") from e
         self.ignore_start_end_max_drones()
+        self.graph = self.build_graph()
+
+    def build_graph(self):
+        graph = Graph()
+        for zone in self.zone_objects.values():
+            graph.add_zone(zone)
+        for connection in self.connections:
+            graph.add_connection(connection)
+        return graph
 
     def ignore_start_end_max_drones(self):
         if self.start_hub_name is not None:
@@ -218,11 +230,12 @@ class Parser:
         if zone2 not in self.zones:
             raise ParserError(f"Unknown zone: {zone2}")
         connection_key = frozenset((zone1, zone2))
-        if connection_key in self.connections:
+        if connection_key in self.connection_keys:
             raise ParserError(f"Duplicate connection: {zone1}-{zone2}")
-        self.connections.add(connection_key)
+        self.connection_keys.add(connection_key)
         if len(parts) == 2:
             max_link_capacity = self.parse_connection_metadata(parts[1])
+        self.connections.append(Connection(zone1, zone2, max_link_capacity))
 
     def validate_zone_name(self, name):
         if "-" in name:
