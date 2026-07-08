@@ -10,10 +10,3 @@ class Connection:
             return self.zone2
         else:
             return self.zone1
-
-    # suprimer cette apres ca 
-    def __repr__(self) -> str:
-        return (
-            f"Connection({self.zone1!r}-{self.zone2!r}, "
-            f"max_link_capacity={self.max_link_capacity})"
-        )
