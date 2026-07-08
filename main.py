@@ -1,5 +1,5 @@
 import sys
-from parser import Parser, ParserError
+from src import Parser, ParserError
 
 
 def main():
