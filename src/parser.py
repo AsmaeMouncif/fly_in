@@ -63,8 +63,6 @@ class Parser:
             except ParserError as e:
                 raise ParserError(f"Line {line_number} {e}") from e
         self.ignore_start_end_max_drones()
-        for zone_name, zone in self.zone_objects.items():
-            print(f"{zone_name}: max_drones={zone.max_drones}")
 
     def ignore_start_end_max_drones(self):
         if self.start_hub_name is not None:
