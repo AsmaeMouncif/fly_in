@@ -18,6 +18,8 @@ class Parser:
         self.zones = set()
         self.zone_objects = {}
         self.connections = set()
+        self.start_hub_name = None
+        self.end_hub_name = None
 
     @staticmethod
     def strip_comment(line):
@@ -60,6 +62,15 @@ class Parser:
                 self.parse_line(content)
             except ParserError as e:
                 raise ParserError(f"Line {line_number} {e}") from e
+        self.ignore_start_end_max_drones()
+        for zone_name, zone in self.zone_objects.items():
+            print(f"{zone_name}: max_drones={zone.max_drones}")
+
+    def ignore_start_end_max_drones(self):
+        if self.start_hub_name is not None:
+            self.zone_objects[self.start_hub_name].max_drones = self.nb_drones
+        if self.end_hub_name is not None:
+            self.zone_objects[self.end_hub_name].max_drones = self.nb_drones
 
     def check_required_fields_present(self, lines):
         has_nb_drones = False
@@ -130,6 +141,7 @@ class Parser:
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
         zone = Zone(zone_data[0], x, y)
         self.zone_objects[zone.name] = zone
+        self.start_hub_name = zone.name
         if metadata is not None:
             self.parse_zone_metadata(zone, metadata)
         self.start_hub_defined = True
@@ -156,6 +168,7 @@ class Parser:
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
         zone = Zone(zone_data[0], x, y)
         self.zone_objects[zone.name] = zone
+        self.end_hub_name = zone.name
         if metadata is not None:
             self.parse_zone_metadata(zone, metadata)
         self.end_hub_defined = True
