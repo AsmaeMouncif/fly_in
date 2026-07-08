@@ -180,7 +180,6 @@ class Parser:
         x, y = self.validate_coordinates(zone_data[1], zone_data[2])
         zone = Zone(zone_data[0], x, y)
         self.zone_objects[zone.name] = zone
-        print(self.zone_objects)
         if metadata is not None:
             self.parse_zone_metadata(zone, metadata)
 
