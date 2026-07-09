@@ -1,5 +1,6 @@
 import sys
 from src.parser import Parser, ParserError
+# from src.dijkstra import Dijkstra
 
 
 def main():
@@ -12,6 +13,12 @@ def main():
     except ParserError as e:
         print(e)
         sys.exit(1)
+    # graph = parser.graph
+    # dijkstra = Dijkstra(graph)
+    # distances = dijkstra.shortest_path(
+    #     parser.start_hub_name
+    # )
+    # print(distances)
 
 
 if __name__ == "__main__":

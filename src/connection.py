@@ -1,4 +1,3 @@
-
 class Connection:
     def __init__(self, zone1, zone2, max_link_capacity):
         self.zone1 = zone1
