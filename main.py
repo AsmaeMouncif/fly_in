@@ -1,7 +1,6 @@
 import sys
 from src.parser import Parser, ParserError
-# from src.dijkstra import Dijkstra
-
+from src.pathfinder import Pathfinder
 
 def main():
     if len(sys.argv) != 2:

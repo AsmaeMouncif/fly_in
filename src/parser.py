@@ -286,6 +286,7 @@ class Parser:
     def parse_connection_metadata(self, metadata):
         if not metadata.startswith("[") or not metadata.endswith("]"):
             raise ParserError(f"Invalid metadata block: {metadata}")
+        print(metadata)
         content = metadata[1:-1]
         if "max_link_capacity=" not in content:
             raise ParserError("Invalid metadata format")
