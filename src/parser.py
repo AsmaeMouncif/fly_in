@@ -226,12 +226,12 @@ class Parser:
         if zone1 == zone2:
             raise ParserError("A zone cannot connect to itself")
         if zone1 not in self.zones:
-            raise ParserError(f"Unknown zone: {zone1}")
+            raise ParserError(f"Unknown zone {zone1}")
         if zone2 not in self.zones:
-            raise ParserError(f"Unknown zone: {zone2}")
+            raise ParserError(f"Unknown zone {zone2}")
         connection_key = frozenset((zone1, zone2))
         if connection_key in self.connection_keys:
-            raise ParserError(f"Duplicate connection: {zone1}-{zone2}")
+            raise ParserError(f"Duplicate connection {zone1}-{zone2}")
         self.connection_keys.add(connection_key)
         if len(parts) == 2:
             max_link_capacity = self.parse_connection_metadata(parts[1])
@@ -243,7 +243,7 @@ class Parser:
         if " " in name:
             raise ParserError("Zone name cannot contain spaces")
         if name in self.zones:
-            raise ParserError(f"Zone name already used: {name}")
+            raise ParserError(f"Zone name already used {name}")
         self.zones.add(name)
 
     def validate_coordinates(self, x, y):
@@ -286,7 +286,6 @@ class Parser:
     def parse_connection_metadata(self, metadata):
         if not metadata.startswith("[") or not metadata.endswith("]"):
             raise ParserError(f"Invalid metadata block: {metadata}")
-        print(metadata)
         content = metadata[1:-1]
         if "max_link_capacity=" not in content:
             raise ParserError("Invalid metadata format")
