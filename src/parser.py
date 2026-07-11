@@ -263,17 +263,17 @@ class Parser:
                 raise ParserError("Invalid metadata format")
             name, value = part.split("=", 1)
             if name not in allowed_names:
-                raise ParserError(f"Unknown metadata: {name}")
+                raise ParserError(f"Unknown metadata {name}")
             if name in seen_names:
-                raise ParserError(f"Duplicate metadata: {name}")
+                raise ParserError(f"Duplicate metadata {name}")
             seen_names.add(name)
             if name == "zone":
                 allowed_types = ["normal", "blocked", "restricted", "priority"]
                 if value not in allowed_types:
-                    raise ParserError(f"Invalid zone type: {value}")
+                    raise ParserError(f"Invalid zone type {value}")
                 zone.zone_type = value
             elif name == "color":
-                zone.color = self.resolve_color(value)
+                zone.color = self.validate_color(value)
             elif name == "max_drones":
                 try:
                     value = int(value)
@@ -285,7 +285,7 @@ class Parser:
 
     def parse_connection_metadata(self, metadata):
         if not metadata.startswith("[") or not metadata.endswith("]"):
-            raise ParserError(f"Invalid metadata block: {metadata}")
+            raise ParserError(f"Invalid metadata block {metadata}")
         content = metadata[1:-1]
         if "max_link_capacity=" not in content:
             raise ParserError("Invalid metadata format")
@@ -301,7 +301,7 @@ class Parser:
             raise ParserError("Invalid max_link_capacity value")
         return max_link_capacity
 
-    def resolve_color(self, value):
+    def validate_color(self, value):
         try:
             pygame.Color(value)
         except ValueError:

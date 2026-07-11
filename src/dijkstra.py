@@ -7,9 +7,9 @@ def dijkstra(graph, start):
     pq.append((0, start))
     while pq:
         min_zone = pq[0]
-        for zone in pq:
-            if min_zone[0] > zone[0]:
-                min_zone = zone
+        for item in pq:
+            if min_zone[0] > item[0]:
+                min_zone = item
         current_distance = min_zone[0]
         current_zone = min_zone[1]
         pq.remove(min_zone)
