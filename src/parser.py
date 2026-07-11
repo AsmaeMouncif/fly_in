@@ -54,17 +54,17 @@ class Parser:
         first_line_number, first_content = lines[0]
         if not first_content.startswith("nb_drones:"):
             raise ParserError(
-                f"Line {first_line_number} nb_drones must be the first line of the file"
+                f"Line {first_line_number}: nb_drones must be the first line of the file"
             )
         contents_only = []
         for line_number, content in lines:
             contents_only.append(content)
-        self.check_required_fields_present(contents_only)
+        self.validate_required_fields(contents_only)
         for line_number, content in lines:
             try:
                 self.parse_line(content)
             except ParserError as e:
-                raise ParserError(f"Line {line_number} {e}") from e
+                raise ParserError(f"Line {line_number}: {e}") from e
         self.ignore_start_end_max_drones()
         self.graph = self.build_graph()
 
@@ -82,7 +82,7 @@ class Parser:
         if self.end_hub_name is not None:
             self.zone_objects[self.end_hub_name].max_drones = self.nb_drones
 
-    def check_required_fields_present(self, lines):
+    def validate_required_fields(self, lines):
         has_nb_drones = False
         has_start_hub = False
         has_end_hub = False
@@ -112,13 +112,13 @@ class Parser:
         elif line.startswith("connection:"):
             self.parse_connection(line)
         else:
-            raise ParserError(f"Unknown line: {line}")
+            raise ParserError(f"Unknown line {line}")
 
     def parse_nb_drones(self, line):
         if self.nb_drones_defined:
             raise ParserError("nb_drones defined multiple times")
         parts = line.split(":")
-        if len(parts) != 2:
+        if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid nb_drones format")
         try:
             nb_drones = int(parts[1].strip())
