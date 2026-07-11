@@ -12,12 +12,10 @@ def main():
     except ParserError as e:
         print(e)
         sys.exit(1)
-    # graph = parser.graph
-    # dijkstra = Dijkstra(graph)
-    # distances = dijkstra.shortest_path(
-    #     parser.start_hub_name
-    # )
-    # print(distances)
+
+    pathfinder = Pathfinder(parser.graph)
+    distances = pathfinder.shortest_path(parser.start_hub_name)
+    print(distances)
 
 
 if __name__ == "__main__":
