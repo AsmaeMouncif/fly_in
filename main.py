@@ -13,7 +13,6 @@ def main():
     except ParserError as e:
         print(e)
         sys.exit(1)
-
     pathfinder = Pathfinder(parser.graph)
     distances = pathfinder.shortest_path(parser.start_hub_name)
     print(distances)

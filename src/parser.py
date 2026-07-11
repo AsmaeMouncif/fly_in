@@ -1,10 +1,10 @@
-import os
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-import re
-import pygame
 from .zone import Zone, DEFAULT_COLOR
 from .connection import Connection
 from .graph import Graph
+import os
+import re
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+import pygame
 
 
 class ParserError(Exception):
