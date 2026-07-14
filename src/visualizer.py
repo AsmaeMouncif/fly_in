@@ -4,7 +4,6 @@ import pygame
 class Visualizer:
     def run(self):
         pygame.init()
-
         screen = pygame.display.set_mode((1100, 600), pygame.RESIZABLE)
         pygame.display.set_caption("fly-in")
 
@@ -18,11 +17,8 @@ class Visualizer:
             screen.fill((0, 0, 0))
 
             # cercle vide (contour blanc)
-            pygame.draw.circle(screen, (0, 255, 0), (550, 300), 70, 3)
+            # pygame.draw.circle(screen, (0, 255, 0), (550, 300), 70, 3)
 
             pygame.display.flip()
 
         pygame.quit()
-
-
-Visualizer().run()
