@@ -1,6 +1,7 @@
 import sys
 from src.parser import Parser, ParserError
 from src.pathfinder import Pathfinder
+from src.visualizer import Visualizer
 
 
 def main():
@@ -14,8 +15,10 @@ def main():
         print(e)
         sys.exit(1)
     pathfinder = Pathfinder(parser.graph)
-    distances = pathfinder.shortest_path(parser.start_hub_name)
+    distances = pathfinder.dijkstra(parser.start_hub_name)
     print(distances)
+    visualizer = Visualizer()
+    visualizer.run()
 
 
 if __name__ == "__main__":

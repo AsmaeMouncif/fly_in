@@ -1,9 +1,14 @@
-
 class Pathfinder:
     def __init__(self, graph):
         self.graph = graph
-    
-    def shortest_path(self, start):
+
+    ZONE_COST = {
+        "normal": 1,
+        "priority": 0.9,
+        "restricted": 2,
+    }
+
+    def dijkstra(self, start):
         pq = []
         distances = {}
         for zone in self.graph.zones:
@@ -21,7 +26,10 @@ class Pathfinder:
             neighbors = self.graph.neighbors(current_zone)
             for connection in neighbors:
                 neighbor = connection.find_other_end(current_zone)
-                distance = 1
+                neighbor_zone = self.graph.zones[neighbor]
+                if neighbor_zone.zone_type == "blocked":
+                    continue
+                distance = self.ZONE_COST[neighbor_zone.zone_type]
                 new_distance = current_distance + distance
                 if new_distance < distances[neighbor]:
                     distances[neighbor] = new_distance
