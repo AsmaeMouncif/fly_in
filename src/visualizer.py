@@ -4,8 +4,10 @@ import pygame
 
 
 class Visualizer:
-    def __init__(self, graph):
+    def __init__(self, graph, start_hub_name=None, end_hub_name=None):
         self.graph = graph
+        self.start_hub_name = start_hub_name
+        self.end_hub_name = end_hub_name
 
     def run(self):
         pygame.init()
