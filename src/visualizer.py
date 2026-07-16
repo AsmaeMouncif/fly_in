@@ -1,3 +1,4 @@
+import math
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
@@ -8,6 +9,20 @@ class Visualizer:
         self.graph = graph
         self.start_hub_name = start_hub_name
         self.end_hub_name = end_hub_name
+
+    def draw_connections(self, screen):
+        for connection in self.graph.connections:
+            zone1 = self.graph.zones[connection.zone1]
+            zone2 = self.graph.zones[connection.zone2]
+            dx = zone2.x - zone1.x
+            dy = zone2.y - zone1.y
+            distance = math.hypot(dx, dy)
+            if distance == 0:
+                continue
+            ux, uy = dx / distance, dy / distance
+            start_point = (zone1.x + ux * 80, zone1.y + uy * 80)
+            end_point = (zone2.x - ux * 80, zone2.y - uy * 80)
+            pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
 
     def run(self):
         pygame.init()
@@ -22,17 +37,17 @@ class Visualizer:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                self.draw_connections(screen)
                 for zone in self.graph.zones.values():
                     pygame.draw.circle(screen, zone.color, [zone.x, zone.y], 80, 3)
                     pygame.draw.circle(screen, zone.color, [zone.x, zone.y], 30)
-                    pygame.draw.line(screen, (200, 200, 200), [100, 300], [550, 300], 1)
                     if len(zone.name) <= 6:
                         display_text = zone.name
                         font = font_small
                     else:
                         display_text = zone.name[0]
                         font = font_big
-                    text_surface = font.render(display_text, True, (255, 255, 255))
+                    text_surface = font.render(display_text, True, (200, 200, 200))
                     text_rect = text_surface.get_rect(center=[zone.x, zone.y])
                     screen.blit(text_surface, text_rect)
                     if zone.name not in (self.start_hub_name, self.end_hub_name):
