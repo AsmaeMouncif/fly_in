@@ -17,10 +17,7 @@ class Visualizer:
                 if event.type == pygame.QUIT:
                     running = False
             for zone in self.graph.zones.values():
-                x = 100 + zone.x * 200
-                y = 100 + zone.y * 200
-                color = pygame.Color(zone.color)
-                pygame.draw.circle(screen, color, [x, y], 80, 3)
-                pygame.draw.circle(screen, color, [x, y], 30)
+                pygame.draw.circle(screen, zone.color, [550, 300], 80, 3)
+                pygame.draw.circle(screen, zone.color, [550, 300], 30)
             pygame.display.flip()
         pygame.quit()
