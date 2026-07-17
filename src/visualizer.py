@@ -28,15 +28,22 @@ class Visualizer:
         pygame.init()
         screen = pygame.display.set_mode((1100, 600), pygame.RESIZABLE)
         pygame.display.set_caption("fly-in")
+        background = pygame.image.load("assets/background.png").convert_alpha()
+        background = pygame.transform.scale(background, screen.get_size())
         font_small = pygame.font.SysFont(None, 23)
         font_big = pygame.font.SysFont(None, 30)
         try:
             running = True
             while running:
-                screen.fill((0, 0, 0))
+                screen.blit(background, (0, 0))
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                    elif event.type == pygame.VIDEORESIZE:
+                        background = pygame.transform.scale(
+                            pygame.image.load("assets/background.png").convert_alpha(),
+                            (event.w, event.h),
+                        )
                 self.draw_connections(screen)
                 for zone in self.graph.zones.values():
                     pygame.draw.circle(screen, zone.color, [zone.x, zone.y], 80, 3)
