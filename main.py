@@ -16,8 +16,7 @@ def main():
         sys.exit(1)
     pathfinder = Pathfinder(parser.graph)
     distances = pathfinder.dijkstra(parser.start_hub_name)
-    print(distances)
-    visualizer = Visualizer(parser.graph, parser.start_hub_name, parser.end_hub_name)
+    visualizer = Visualizer(parser.graph, parser.start_hub_name, parser.end_hub_name, parser.nb_drones)
     visualizer.run()
 
 
