@@ -11,9 +11,11 @@ class Pathfinder:
     def dijkstra(self, start):
         pq = []
         distances = {}
+        predecessors = {}
         for zone in self.graph.zones:
             distances[zone] = float("inf")
         distances[start] = 0
+        predecessors[start] = None
         pq.append((0, start))
         while pq:
             min_zone = pq[0]
@@ -33,5 +35,6 @@ class Pathfinder:
                 new_distance = current_distance + distance
                 if new_distance < distances[neighbor]:
                     distances[neighbor] = new_distance
+                    predecessors[neighbor] = current_zone
                     pq.append((new_distance, neighbor))
-        return distances
+        return distances, predecessors
