@@ -5,10 +5,11 @@ import pygame
 
 
 class Visualizer:
-    def __init__(self, graph, start_hub_name=None, end_hub_name=None):
+    def __init__(self, graph, start_hub_name=None, end_hub_name=None, nb_drones=0):
         self.graph = graph
         self.start_hub_name = start_hub_name
         self.end_hub_name = end_hub_name
+        self.nb_drones = nb_drones
 
     def draw_connections(self, screen):
         for connection in self.graph.connections:
