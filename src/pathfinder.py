@@ -38,3 +38,14 @@ class Pathfinder:
                     predecessors[neighbor] = current_zone
                     pq.append((new_distance, neighbor))
         return distances, predecessors
+
+    def reconstruct_path(self, predecessors, start, end):
+        path = []
+        current = end
+        while current is not None:
+            path.append(current)
+            current = predecessors.get(current)
+        path.reverse()
+        if not path or path[0] != start:
+            return None
+        return path
