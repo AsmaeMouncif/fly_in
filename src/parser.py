@@ -65,6 +65,7 @@ class Parser:
                 self.parse_line(content)
             except ParserError as e:
                 raise ParserError(f"Line {line_number}: {e}") from e
+        self.validate_start_end_zone_types()
         self.ignore_start_end_max_drones()
         self.graph = self.build_graph()
 
@@ -81,6 +82,14 @@ class Parser:
             self.zone_objects[self.start_hub_name].max_drones = self.nb_drones
         if self.end_hub_name is not None:
             self.zone_objects[self.end_hub_name].max_drones = self.nb_drones
+
+    def validate_start_end_zone_types(self):
+        start_hub = self.zone_objects[self.start_hub_name]
+        end_hub = self.zone_objects[self.end_hub_name]
+        if start_hub.zone_type == "blocked":
+            raise ParserError("start_hub cannot be blocked")
+        if end_hub.zone_type == "blocked":
+            raise ParserError("end_hub cannot be blocked")
 
     def validate_required_fields(self, lines):
         has_nb_drones = False
