@@ -12,6 +12,7 @@ class Visualizer:
         self.path = path if path else [start_hub_name]
         self.path_index = 0
 
+    # def draw_connection(self, screen):
 
     def run(self):
         pygame.init()
@@ -21,7 +22,7 @@ class Visualizer:
         background = pygame.transform.scale(background, screen.get_size())
         running = True
         while running:
-            # screen.blit(background, (0, 0))
+            screen.blit(background, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -30,5 +31,7 @@ class Visualizer:
                         pygame.image.load("assets/background.png"),
                         (event.w, event.h),
                     )
-            # pygame.display.flip()
+            for zone in self.graph.zones.values():
+                pygame.draw.circle(screen, zone.color, [zone.x, zone.y], 80, 3)
+            pygame.display.flip()
         pygame.quit()
