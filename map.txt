@@ -1,10 +1,24 @@
-nb_drones: 2
+nb_drones: 4
 
-start_hub: start 0 0 [color=steelblue]
-hub: waypoint1 1 0 [color=limegreen]
-hub: waypoint2 2 0 [color=orange]
-end_hub: goal 3 0
+start_hub: Start 120 300 [color=limegreen]
+hub: A 280 150 [color=royalblue max_drones=1]
+hub: B 280 450 [zone=priority color=purple max_drones=2]
+hub: C 500 100 [zone=restricted color=orange max_drones=1]
+hub: D 500 300 [color=turquoise max_drones=2]
+hub: E 500 500 [zone=blocked color=red max_drones=1]
+hub: F 750 150 [color=slateblue max_drones=2]
+hub: G 750 450 [zone=priority color=violet max_drones=2]
+end_hub: Goal 980 300 [color=gold]
 
-connection: start-waypoint1
-connection: waypoint1-waypoint2
-connection: waypoint2-goal
+connection: Start-A
+connection: Start-B [max_link_capacity=2]
+connection: A-C [max_link_capacity=1]
+connection: A-D [max_link_capacity=1]
+connection: B-D [max_link_capacity=1]
+connection: B-E [max_link_capacity=1]
+connection: C-F [max_link_capacity=1]
+connection: D-F [max_link_capacity=1]
+connection: D-G [max_link_capacity=2]
+connection: E-G [max_link_capacity=1]
+connection: F-Goal [max_link_capacity=1]
+connection: G-Goal [max_link_capacity=2]
