@@ -68,6 +68,14 @@ class Visualizer:
             end_point = (sx2 - ux * 80, sy2 - uy * 80)
             pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
 
+    def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
+        start_zone = self.graph.zones[self.start_hub_name]
+        sx, sy = self.to_screen_coords(
+            start_zone.x, start_zone.y, screen_w, screen_h,
+            min_x, max_x, min_y, max_y
+        )
+        pygame.draw.circle(screen, (255, 255, 255), (sx, sy), 10)
+
     def run(self):
         pygame.init()
         screen = pygame.display.set_mode((1100, 600), pygame.RESIZABLE)
@@ -114,5 +122,6 @@ class Visualizer:
                     capacity_surface = font_small.render(capacity_text, True, (200, 200, 200))
                     capacity_rect = capacity_surface.get_rect(center=[sx, sy + 110])
                     screen.blit(capacity_surface, capacity_rect)
+            self.draw_drones(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
             pygame.display.flip()
         pygame.quit()
