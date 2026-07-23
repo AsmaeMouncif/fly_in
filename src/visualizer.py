@@ -52,6 +52,8 @@ class Visualizer:
         background = pygame.image.load("assets/background.png")
         background = pygame.transform.scale(background, screen.get_size())
         min_x, max_x, min_y, max_y = self.compute_bounds()
+        font_small = pygame.font.SysFont(None, 23)
+        font_big = pygame.font.SysFont(None, 30)
         running = True
         while running:
             screen_w, screen_h = screen.get_size()
@@ -71,5 +73,17 @@ class Visualizer:
                 )
                 pygame.draw.circle(screen, zone.color, [sx, sy], 80, 3)
                 pygame.draw.circle(screen, zone.color, [sx, sy], 30)
+                if len(zone.name) <= 6:
+                    display_text = zone.name
+                    font = font_small
+                else:
+                    display_text = zone.name[0]
+                    font = font_big
+                shadow_surface = font.render(display_text, True, (0, 0, 0))
+                shadow_rect = shadow_surface.get_rect(center=[sx + 2, sy + 2])
+                screen.blit(shadow_surface, shadow_rect)
+                text_surface = font.render(display_text, True, (200, 200, 200))
+                text_rect = text_surface.get_rect(center=[sx, sy])
+                screen.blit(text_surface, text_rect)
             pygame.display.flip()
         pygame.quit()
