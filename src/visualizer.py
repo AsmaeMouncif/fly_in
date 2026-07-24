@@ -76,12 +76,13 @@ class Visualizer:
             pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
 
     def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
-        start_zone = self.graph.zones[self.start_hub_name]
-        sx, sy = self.to_screen_coords(
-                start_zone.x, start_zone.y, screen_w, screen_h,
-                min_x, max_x, min_y, max_y
+        for drone in self.drones:
+            zone = self.graph.zones[drone.current_zone]
+            sx, sy = self.to_screen_coords(
+                    zone.x, zone.y, screen_w, screen_h,
+                    min_x, max_x, min_y, max_y
             )
-        pygame.draw.circle(screen, (255, 255, 255), (sx, sy), 7)
+            pygame.draw.circle(screen, (255, 255, 255), (sx, sy), 7)
 
     def can_enter_zone(self, zone_name):
         zone = self.graph.zones[zone_name]
