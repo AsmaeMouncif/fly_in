@@ -20,6 +20,12 @@ class Visualizer:
         self.move_interval = 800  # ms entre chaque mouvement
         self.last_move_time = 0
     #cette comprendre
+    def reset(self):
+        self.zone_occupancy = {name: 0 for name in self.graph.zones}
+        self.zone_occupancy[self.start_hub_name] = self.nb_drones
+        self.drones = [Drone(self.path) for _ in range(self.nb_drones)]
+        self.last_move_time = pygame.time.get_ticks()
+    #cette comp
     def compute_bounds(self):
         min_x = None
         max_x = None
@@ -120,6 +126,9 @@ class Visualizer:
                         pygame.image.load("assets/background.png"),
                         (event.w, event.h),
                     )
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_F5:
+                        self.reset()
             # cette
             now = pygame.time.get_ticks()
             if now - self.last_move_time >= self.move_interval:
