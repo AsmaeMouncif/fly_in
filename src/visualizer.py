@@ -3,6 +3,20 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
 import math
 from .drone import Drone
+import random
+DRONE_COLORS = [
+    (123, 104, 238),
+    (128, 0, 128),
+    (0, 128, 0),
+    (0, 0, 255),
+    (255, 0, 0),
+    (255, 215, 0),
+    (70, 130, 180),
+    (205, 133, 63),
+    (186, 85, 211),
+    (0, 128, 128),
+    (128, 0, 0)
+]
 
 
 class Visualizer:
@@ -19,6 +33,7 @@ class Visualizer:
         self.drones = [Drone(self.path) for _ in range(self.nb_drones)]
         self.move_interval = 800  # ms entre chaque mouvement
         self.last_move_time = 0
+        self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
     #cette comprendre
     def reset(self):
         self.zone_occupancy = {name: 0 for name in self.graph.zones}
@@ -81,15 +96,26 @@ class Visualizer:
             end_point = (sx2 - ux * 80, sy2 - uy * 80)
             pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
 
+    #comprendre cette
     def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
+        drones_by_zone = {}
         for drone in self.drones:
-            zone = self.graph.zones[drone.current_zone]
+            drones_by_zone.setdefault(drone.current_zone, []).append(drone)
+        radius = 55  # entre le petit cercle (30) et le grand cercle (80)
+        for zone_name, drones in drones_by_zone.items():
+            zone = self.graph.zones[zone_name]
             sx, sy = self.to_screen_coords(
-                    zone.x, zone.y, screen_w, screen_h,
-                    min_x, max_x, min_y, max_y
+                zone.x, zone.y, screen_w, screen_h,
+                min_x, max_x, min_y, max_y
             )
-            pygame.draw.circle(screen, (255, 255, 255), (sx, sy), 7)
-
+            count = len(drones)
+            for i, drone in enumerate(drones):
+                angle = (2 * math.pi / count) * i
+                dx = math.cos(angle) * radius
+                dy = math.sin(angle) * radius
+                pygame.draw.circle(screen, self.drone_colors[i], (sx + dx, sy + dy), 18)
+                pygame.draw.circle(screen, (200, 200, 208), (sx + dx, sy + dy), 13)
+                
     def can_enter_zone(self, zone_name):
         zone = self.graph.zones[zone_name]
         return self.zone_occupancy[zone_name] < zone.max_drones
