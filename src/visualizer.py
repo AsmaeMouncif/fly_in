@@ -31,7 +31,7 @@ class Visualizer:
         self.zone_occupancy = {name: 0 for name in self.graph.zones}
         self.zone_occupancy[start_hub_name] = nb_drones
         self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
-        self.move_interval = 800  # ms entre chaque mouvement
+        self.move_interval = 1500  # ms entre chaque mouvement
         self.last_move_time = 0
         self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
     #cette comprendre
@@ -109,25 +109,28 @@ class Visualizer:
                 min_x, max_x, min_y, max_y
             )
             count = len(drones)
-        for i, drone in enumerate(drones):
-            color = self.drone_colors[drone.drone_id]  # au lieu de self.drone_colors[i]
-            angle = (2 * math.pi / count) * i
-            dx = math.cos(angle) * radius
-            dy = math.sin(angle) * radius
-            cx = sx + dx
-            cy = sy + dy
-            arm = 12
-            pygame.draw.line(screen, color, (cx - 11, cy - 11), (cx - 11 - arm, cy - 11 - arm), 4)
-            pygame.draw.line(screen, color, (cx + 11, cy - 11), (cx + 11 + arm, cy - 11 - arm), 4)
-            pygame.draw.line(screen, color, (cx - 11, cy + 11), (cx - 11 - arm, cy + 11 + arm), 4)
-            pygame.draw.line(screen, color, (cx + 11, cy + 11), (cx + 11 + arm, cy + 11 + arm), 4)
-            pygame.draw.circle(screen, color, (cx, cy), 18)
-            pygame.draw.circle(screen, (200, 200, 208), (cx, cy), 13)
-            label_text = f"D{drone.drone_id + 1}"
-            label_surface = font.render(label_text, True, color)
-            label_rect = label_surface.get_rect(center=(cx, cy - 28))
-            screen.blit(label_surface, label_rect)
-    
+            for i, drone in enumerate(drones):          # <-- maintenant indenté à l'intérieur
+                color = self.drone_colors[drone.drone_id]
+                angle = (2 * math.pi / count) * i
+                dx = math.cos(angle) * radius
+                dy = math.sin(angle) * radius
+                cx = sx + dx
+                cy = sy + dy
+                arm = 12
+                pygame.draw.line(screen, color, (cx - 11, cy - 11), (cx - 11 - arm, cy - 11 - arm), 4)
+                pygame.draw.line(screen, color, (cx + 11, cy - 11), (cx + 11 + arm, cy - 11 - arm), 4)
+                pygame.draw.line(screen, color, (cx - 11, cy + 11), (cx - 11 - arm, cy + 11 + arm), 4)
+                pygame.draw.line(screen, color, (cx + 11, cy + 11), (cx + 11 + arm, cy + 11 + arm), 4)
+                pygame.draw.circle(screen, color, (cx, cy), 18)
+                pygame.draw.circle(screen, (200, 200, 208), (cx, cy), 13)
+                label_text = f"D{drone.drone_id + 1}"
+                shadow_surface = font.render(label_text, True, (0, 0, 0))
+                shadow_rect = shadow_surface.get_rect(center=(cx + 2, cy - 28 + 2))
+                screen.blit(shadow_surface, shadow_rect)
+                label_surface = font.render(label_text, True, color)
+                label_rect = label_surface.get_rect(center=(cx, cy - 28))
+                screen.blit(label_surface, label_rect)
+        
     def can_enter_zone(self, zone_name):
         zone = self.graph.zones[zone_name]
         return self.zone_occupancy[zone_name] < zone.max_drones
@@ -208,7 +211,7 @@ class Visualizer:
                 text_rect = text_surface.get_rect(center=[sx, sy])
                 screen.blit(text_surface, text_rect)
                 if zone.name not in (self.start_hub_name, self.end_hub_name):
-                    capacity_text = f"0 ⁄ {zone.max_drones}"
+                    capacity_text = f"{self.zone_occupancy[zone.name]} ⁄ {zone.max_drones}"
                     capacity_surface = font_small.render(capacity_text, True, (200, 200, 200))
                     capacity_rect = capacity_surface.get_rect(center=[sx, sy + 110])
                     screen.blit(capacity_surface, capacity_rect)
