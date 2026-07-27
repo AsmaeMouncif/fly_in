@@ -30,7 +30,7 @@ class Visualizer:
         self.padding = 100
         self.zone_occupancy = {name: 0 for name in self.graph.zones}
         self.zone_occupancy[start_hub_name] = nb_drones
-        self.drones = [Drone(self.path) for _ in range(self.nb_drones)]
+        self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
         self.move_interval = 800  # ms entre chaque mouvement
         self.last_move_time = 0
         self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
@@ -38,7 +38,7 @@ class Visualizer:
     def reset(self):
         self.zone_occupancy = {name: 0 for name in self.graph.zones}
         self.zone_occupancy[self.start_hub_name] = self.nb_drones
-        self.drones = [Drone(self.path) for _ in range(self.nb_drones)]
+        self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
         self.last_move_time = pygame.time.get_ticks()
     #cette comp
     def compute_bounds(self):
@@ -97,7 +97,7 @@ class Visualizer:
             pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
 
     #comprendre cette
-    def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
+    def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font):
         drones_by_zone = {}
         for drone in self.drones:
             drones_by_zone.setdefault(drone.current_zone, []).append(drone)
@@ -109,25 +109,50 @@ class Visualizer:
                 min_x, max_x, min_y, max_y
             )
             count = len(drones)
-            for i, drone in enumerate(drones):
-                angle = (2 * math.pi / count) * i
-                dx = math.cos(angle) * radius
-                dy = math.sin(angle) * radius
-                pygame.draw.circle(screen, self.drone_colors[i], (sx + dx, sy + dy), 18)
-                pygame.draw.circle(screen, (200, 200, 208), (sx + dx, sy + dy), 13)
-                
+        for i, drone in enumerate(drones):
+            color = self.drone_colors[drone.drone_id]  # au lieu de self.drone_colors[i]
+            angle = (2 * math.pi / count) * i
+            dx = math.cos(angle) * radius
+            dy = math.sin(angle) * radius
+            cx = sx + dx
+            cy = sy + dy
+            arm = 12
+            pygame.draw.line(screen, color, (cx - 11, cy - 11), (cx - 11 - arm, cy - 11 - arm), 4)
+            pygame.draw.line(screen, color, (cx + 11, cy - 11), (cx + 11 + arm, cy - 11 - arm), 4)
+            pygame.draw.line(screen, color, (cx - 11, cy + 11), (cx - 11 - arm, cy + 11 + arm), 4)
+            pygame.draw.line(screen, color, (cx + 11, cy + 11), (cx + 11 + arm, cy + 11 + arm), 4)
+            pygame.draw.circle(screen, color, (cx, cy), 18)
+            pygame.draw.circle(screen, (200, 200, 208), (cx, cy), 13)
+            label_text = f"D{drone.drone_id + 1}"
+            label_surface = font.render(label_text, True, color)
+            label_rect = label_surface.get_rect(center=(cx, cy - 28))
+            screen.blit(label_surface, label_rect)
+    
     def can_enter_zone(self, zone_name):
         zone = self.graph.zones[zone_name]
         return self.zone_occupancy[zone_name] < zone.max_drones
 
-    def try_move_drone(self, drone):
+    #comprendre cette
+    def can_use_link(self, connection, link_usage):
+        if connection is None:
+            return True
+        return link_usage.get(id(connection), 0) < connection.max_link_capacity
+    #name fonction check linj_usage
+    def try_move_drone(self, drone, link_usage):
         next_zone = drone.next_zone
         if next_zone is None:
             return False
         if self.can_enter_zone(next_zone) is False:
             return False
+        #check cette
+        connection = self.graph.get_connection(drone.current_zone, next_zone)
+        if self.can_use_link(connection, link_usage) is False:
+            return False
         self.zone_occupancy[drone.current_zone] -= 1
         self.zone_occupancy[next_zone] += 1
+        ##check cette
+        if connection is not None:
+            link_usage[id(connection)] = link_usage.get(id(connection), 0) + 1
         drone.path_index += 1
         return True
 
@@ -158,8 +183,9 @@ class Visualizer:
             # cette
             now = pygame.time.get_ticks()
             if now - self.last_move_time >= self.move_interval:
+                link_usage = {}
                 for drone in self.drones:
-                    self.try_move_drone(drone)
+                    self.try_move_drone(drone, link_usage)
                 self.last_move_time = now
             self.draw_connections(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
             for zone in self.graph.zones.values():
@@ -186,6 +212,6 @@ class Visualizer:
                     capacity_surface = font_small.render(capacity_text, True, (200, 200, 200))
                     capacity_rect = capacity_surface.get_rect(center=[sx, sy + 110])
                     screen.blit(capacity_surface, capacity_rect)
-            self.draw_drones(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
+            self.draw_drones(screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font_small)
             pygame.display.flip()
         pygame.quit()

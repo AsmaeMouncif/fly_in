@@ -14,7 +14,7 @@ connection: Start-A
 connection: Start-B [max_link_capacity=2]
 connection: A-C [max_link_capacity=1]
 connection: A-D [max_link_capacity=1]
-connection: B-D [max_link_capacity=1]
+connection: B-D [max_link_capacity=2]
 connection: B-E [max_link_capacity=1]
 connection: C-F [max_link_capacity=1]
 connection: D-F [max_link_capacity=1]

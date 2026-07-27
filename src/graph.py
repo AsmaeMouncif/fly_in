@@ -15,3 +15,9 @@ class Graph:
 
     def neighbors(self, zone_name):
         return self.adjacency.get(zone_name, [])
+
+    def get_connection(self, zone1, zone2):
+        for connection in self.adjacency.get(zone1, []):
+            if connection.find_other_end(zone1) == zone2:
+                return connection
+        return None
