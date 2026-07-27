@@ -109,18 +109,56 @@ class Visualizer:
                 min_x, max_x, min_y, max_y
             )
             count = len(drones)
-            for i, drone in enumerate(drones):          # <-- maintenant indenté à l'intérieur
+            for i, drone in enumerate(drones):
                 color = self.drone_colors[drone.drone_id]
                 angle = (2 * math.pi / count) * i
                 dx = math.cos(angle) * radius
                 dy = math.sin(angle) * radius
                 cx = sx + dx
                 cy = sy + dy
-                arm = 12
-                pygame.draw.line(screen, color, (cx - 11, cy - 11), (cx - 11 - arm, cy - 11 - arm), 4)
-                pygame.draw.line(screen, color, (cx + 11, cy - 11), (cx + 11 + arm, cy - 11 - arm), 4)
-                pygame.draw.line(screen, color, (cx - 11, cy + 11), (cx - 11 - arm, cy + 11 + arm), 4)
-                pygame.draw.line(screen, color, (cx + 11, cy + 11), (cx + 11 + arm, cy + 11 + arm), 4)
+
+                arm = 20
+                arm_width = 4
+                arm_color = color
+                x_color = (200, 200, 200)   # ← couleur fixe grise pour le bras et le X
+
+                prop_size = 10
+                prop_spread = 0.5
+                prop_width = 2
+
+                circle_radius = 3
+
+                arm_ends = [
+                    (cx - 11, cy - 11, cx - 11 - arm, cy - 11 - arm),
+                    (cx + 11, cy - 11, cx + 11 + arm, cy - 11 - arm),
+                    (cx - 11, cy + 11, cx - 11 - arm, cy + 11 + arm),
+                    (cx + 11, cy + 11, cx + 11 + arm, cy + 11 + arm),
+                ]
+                for start_x, start_y, end_x, end_y in arm_ends:
+                    # ligne du bras (utilise arm_color au lieu de color)
+                    pygame.draw.line(screen, arm_color, (start_x, start_y), (end_x, end_y), arm_width)
+
+                    bdx, bdy = end_x - start_x, end_y - start_y
+                    length = math.hypot(bdx, bdy)
+                    ux, uy = bdx / length, bdy / length
+                    px, py = -uy, ux
+
+                    d1x, d1y = ux + px * prop_spread, uy + py * prop_spread
+                    d2x, d2y = ux - px * prop_spread, uy - py * prop_spread
+                    n1 = math.hypot(d1x, d1y)
+                    n2 = math.hypot(d2x, d2y)
+                    d1x, d1y = d1x / n1, d1y / n1
+                    d2x, d2y = d2x / n2, d2y / n2
+
+                    # les 2 lignes du X (utilisent aussi arm_color)
+                    pygame.draw.line(screen, x_color,
+                                      (end_x - d1x * prop_size, end_y - d1y * prop_size),
+                                      (end_x + d1x * prop_size, end_y + d1y * prop_size), prop_width)
+                    pygame.draw.line(screen, x_color,
+                                      (end_x - d2x * prop_size, end_y - d2y * prop_size),
+                                      (end_x + d2x * prop_size, end_y + d2y * prop_size), prop_width)
+
+                    pygame.draw.circle(screen, x_color, (end_x, end_y), circle_radius)
                 pygame.draw.circle(screen, color, (cx, cy), 18)
                 pygame.draw.circle(screen, (200, 200, 208), (cx, cy), 13)
                 label_text = f"D{drone.drone_id + 1}"
