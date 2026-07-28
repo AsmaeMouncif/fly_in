@@ -184,7 +184,7 @@ class Visualizer:
             return False
         if self.can_enter_zone(next_zone) is False:
             return False
-        # connection = self.graph.get_connection(drone.current_zone, next_zone)
+        connection = self.graph.get_connection(drone.current_zone, next_zone)
         if self.can_use_link(connection, link_usage) is False:
             return False
         self.zone_occupancy[drone.current_zone] -= 1
