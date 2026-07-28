@@ -87,7 +87,8 @@ class Visualizer:
             distance = math.sqrt(dx * dx + dy * dy)
             if distance == 0:
                 continue
-            ux, uy = dx / distance, dy / distance
+            ux = dx / distance
+            uy = dy / distance
             start_point = (sx1 + ux * 80, sy1 + uy * 80)
             end_point = (sx2 - ux * 80, sy2 - uy * 80)
             pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
