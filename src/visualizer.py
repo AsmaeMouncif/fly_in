@@ -18,10 +18,10 @@ class Visualizer:
         else:
             self.path = [start_hub_name]
         self.last_move_time = 0
+        self.zone_occupancy = {name: 0 for name in self.graph.zones}
+        self.zone_occupancy[start_hub_name] = nb_drones
         # self.path_index = 0
         # self.padding = 100
-        # self.zone_occupancy = {name: 0 for name in self.graph.zones}
-        # self.zone_occupancy[start_hub_name] = nb_drones
         # self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
         # self.move_interval = 1500
         # self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
@@ -38,21 +38,21 @@ class Visualizer:
             self.drones.append(drone)
         self.last_move_time = pygame.time.get_ticks()
 
-    # def compute_bounds(self):
-    #     min_x = None
-    #     max_x = None
-    #     min_y = None
-    #     max_y = None
-    #     for zone in self.graph.zones.values():
-    #         if min_x is None or zone.x < min_x:
-    #             min_x = zone.x
-    #         if max_x is None or zone.x > max_x:
-    #             max_x = zone.x
-    #         if min_y is None or zone.y < min_y:
-    #             min_y = zone.y
-    #         if max_y is None or zone.y > max_y:
-    #             max_y = zone.y
-    #     return min_x, max_x, min_y, max_y
+    def compute_bounds(self):
+        min_x = None
+        max_x = None
+        min_y = None
+        max_y = None
+        for zone in self.graph.zones.values():
+            if min_x is None or zone.x < min_x:
+                min_x = zone.x
+            if max_x is None or zone.x > max_x:
+                max_x = zone.x
+            if min_y is None or zone.y < min_y:
+                min_y = zone.y
+            if max_y is None or zone.y > max_y:
+                max_y = zone.y
+        return min_x, max_x, min_y, max_y
 
     # def to_screen_coords(self, x, y, screen_width, screen_height,
     #                      min_x, max_x, min_y, max_y):
@@ -87,6 +87,7 @@ class Visualizer:
             distance = math.sqrt(dx * dx + dy * dy)
             if distance == 0:
                 continue
+            #3 lines
             ux = dx / distance
             uy = dy / distance
             start_point = (sx1 + ux * 80, sy1 + uy * 80)
