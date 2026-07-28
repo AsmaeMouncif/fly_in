@@ -190,6 +190,7 @@ class Visualizer:
         self.zone_occupancy[drone.current_zone] -= 1
         self.zone_occupancy[next_zone] += 1
         if connection is not None:
+            #ce line
             link_usage[id(connection)] = link_usage.get(id(connection), 0) + 1
         drone.path_index += 1
         return True
