@@ -169,16 +169,16 @@ class Visualizer:
     #             label_rect = label_surface.get_rect(center=(cx, cy - 28))
     #             screen.blit(label_surface, label_rect)
         
-    # def can_enter_zone(self, zone_name):
-    #     zone = self.graph.zones[zone_name]
-    #     return self.zone_occupancy[zone_name] < zone.max_drones
+    def can_enter_zone(self, zone_name):
+        zone = self.graph.zones[zone_name]
+        return self.zone_occupancy[zone_name] < zone.max_drones
 
-    # #comprendre cette
-    # def can_use_link(self, connection, link_usage):
-    #     if connection is None:
-    #         return True
-    #     return link_usage.get(id(connection), 0) < connection.max_link_capacity
-    # #name fonction check linj_usage
+    def can_use_link(self, connection, link_usage):
+        if connection is None:
+            return True
+        return link_usage.get(id(connection), 0) < connection.max_link_capacity
+
+    #name fonction check linj_usage
     # def try_move_drone(self, drone, link_usage):
     #     next_zone = drone.next_zone
     #     if next_zone is None:
