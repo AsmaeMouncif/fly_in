@@ -253,6 +253,9 @@ class Visualizer:
                 screen.blit(text_surface, text_rect)
                 if zone.name not in (self.start_hub_name, self.end_hub_name):
                     capacity_text = f"{self.zone_occupancy[zone.name]} ⁄ {zone.max_drones}"
+                    shadow_surface = font_small.render(capacity_text, True, (0, 0, 0))
+                    shadow_rect = shadow_surface.get_rect(center=[sx + 2, sy + 112])
+                    screen.blit(shadow_surface, shadow_rect)
                     capacity_surface = font_small.render(capacity_text, True, (200, 200, 200))
                     capacity_rect = capacity_surface.get_rect(center=[sx, sy + 110])
                     screen.blit(capacity_surface, capacity_rect)
