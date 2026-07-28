@@ -13,7 +13,10 @@ class Visualizer:
         self.start_hub_name = start_hub_name
         self.end_hub_name = end_hub_name
         self.nb_drones = nb_drones
-        self.path = path if path else [start_hub_name]
+        if path:
+            self.path = path
+        else:
+            self.path = [start_hub_name]
         # self.path_index = 0
         # self.padding = 100
         # self.zone_occupancy = {name: 0 for name in self.graph.zones}
