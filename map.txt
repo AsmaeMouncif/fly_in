@@ -1,4 +1,4 @@
-nb_drones: 8
+nb_drones: 4
 
 start_hub: Start 120 300 [color=limegreen]
 hub: A 280 150 [color=royalblue max_drones=1]

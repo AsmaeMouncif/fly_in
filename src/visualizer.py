@@ -19,17 +19,18 @@ class Visualizer:
         self.zone_occupancy = {name: 0 for name in self.graph.zones}
         self.zone_occupancy[start_hub_name] = nb_drones
         self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
-        self.move_interval = 1500  # ms entre chaque mouvement
+        self.move_interval = 1500
+        self.travel_ratio = 0.6
         self.last_move_time = 0
         self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
         self.propeller_angle = 0
-    #cette comprendre
+
     def reset(self):
         self.zone_occupancy = {name: 0 for name in self.graph.zones}
         self.zone_occupancy[self.start_hub_name] = self.nb_drones
         self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
         self.last_move_time = pygame.time.get_ticks()
-    #cette comp
+
     def compute_bounds(self):
         min_x = None
         max_x = None
@@ -45,7 +46,7 @@ class Visualizer:
             if max_y is None or zone.y > max_y:
                 max_y = zone.y
         return min_x, max_x, min_y, max_y
-    #cette comprendre
+
     def to_screen_coords(self, x, y, screen_width, screen_height,
                          min_x, max_x, min_y, max_y):
         range_x = max_x - min_x
@@ -84,19 +85,41 @@ class Visualizer:
             start_point = (sx1 + ux * 80, sy1 + uy * 80)
             end_point = (sx2 - ux * 80, sy2 - uy * 80)
             pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
+    
+    def get_drone_center(self, drone, screen_w, screen_h, min_x, max_x, min_y, max_y, t):
+        from_zone = self.graph.zones[drone.anim_from]
+        to_zone = self.graph.zones[drone.anim_to]
+        sx1, sy1 = self.to_screen_coords(from_zone.x, from_zone.y, screen_w, screen_h, min_x, max_x, min_y, max_y)
+        sx2, sy2 = self.to_screen_coords(to_zone.x, to_zone.y, screen_w, screen_h, min_x, max_x, min_y, max_y)
+        x = sx1 + (sx2 - sx1) * t
+        y = sy1 + (sy2 - sy1) * t
+        return x, y
 
-    #comprendre cette
-    def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font):
-        drones_by_zone = {}
+    def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font, t):
+        drones_by_line = {}
         for drone in self.drones:
-            drones_by_zone.setdefault(drone.current_zone, []).append(drone)
-        radius = 55  # entre le petit cercle (30) et le grand cercle (80)
-        for zone_name, drones in drones_by_zone.items():
-            zone = self.graph.zones[zone_name]
-            sx, sy = self.to_screen_coords(
-                zone.x, zone.y, screen_w, screen_h,
-                min_x, max_x, min_y, max_y
+            key = (drone.anim_from, drone.anim_to)
+            drones_by_line.setdefault(key, []).append(drone)
+        radius = 55
+        for (from_name, to_name), drones in drones_by_line.items():
+            sx, sy = self.get_drone_center(
+                drones[0], screen_w, screen_h, min_x, max_x, min_y, max_y, t
             )
+            # angle de la ligne pour orienter le drone pendant le vol ;
+            # une fois arrivé (t == 1, phase de pause), on garde une orientation neutre
+            if from_name != to_name and t < 1.0:
+                from_zone = self.graph.zones[from_name]
+                to_zone = self.graph.zones[to_name]
+                lx1, ly1 = self.to_screen_coords(from_zone.x, from_zone.y, screen_w, screen_h, min_x, max_x, min_y, max_y)
+                lx2, ly2 = self.to_screen_coords(to_zone.x, to_zone.y, screen_w, screen_h, min_x, max_x, min_y, max_y)
+                line_angle = math.atan2(ly2 - ly1, lx2 - lx1)
+            else:
+                line_angle = 0
+            cos_l, sin_l = math.cos(line_angle), math.sin(line_angle)
+
+            def rotate(px, py):
+                return px * cos_l - py * sin_l, px * sin_l + py * cos_l
+
             count = len(drones)
             for i, drone in enumerate(drones):
                 color = self.drone_colors[drone.drone_id]
@@ -105,53 +128,44 @@ class Visualizer:
                 dy = math.sin(angle) * radius
                 cx = sx + dx
                 cy = sy + dy
-
                 arm = 20
                 arm_width = 4
                 arm_color = color
-                x_color = (200, 200, 200)   # ← couleur fixe grise pour le bras et le X
-
+                x_color = (200, 200, 200)
                 prop_size = 10
                 prop_spread = 0.5
                 prop_width = 2
-
                 circle_radius = 3
-
-                arm_ends = [
-                    (cx - 11, cy - 11, cx - 11 - arm, cy - 11 - arm),
-                    (cx + 11, cy - 11, cx + 11 + arm, cy - 11 - arm),
-                    (cx - 11, cy + 11, cx - 11 - arm, cy + 11 + arm),
-                    (cx + 11, cy + 11, cx + 11 + arm, cy + 11 + arm),
+                arm_base = [
+                    ((-11, -11), (-11 - arm, -11 - arm)),
+                    ((11, -11), (11 + arm, -11 - arm)),
+                    ((-11, 11), (-11 - arm, 11 + arm)),
+                    ((11, 11), (11 + arm, 11 + arm)),
                 ]
+                arm_ends = []
+                for (bsx, bsy), (bex, bey) in arm_base:
+                    rsx, rsy = rotate(bsx, bsy)
+                    rex, rey = rotate(bex, bey)
+                    arm_ends.append((cx + rsx, cy + rsy, cx + rex, cy + rey))
                 for start_x, start_y, end_x, end_y in arm_ends:
-                    # ligne du bras (utilise arm_color au lieu de color)
                     pygame.draw.line(screen, arm_color, (start_x, start_y), (end_x, end_y), arm_width)
-
                     bdx, bdy = end_x - start_x, end_y - start_y
                     length = math.hypot(bdx, bdy)
                     ux, uy = bdx / length, bdy / length
                     px, py = -uy, ux
-
                     d1x, d1y = ux + px * prop_spread, uy + py * prop_spread
                     d2x, d2y = ux - px * prop_spread, uy - py * prop_spread
                     n1 = math.hypot(d1x, d1y)
                     n2 = math.hypot(d2x, d2y)
                     d1x, d1y = d1x / n1, d1y / n1
                     d2x, d2y = d2x / n2, d2y / n2
-
-                    # les 2 lignes du X (utilisent aussi arm_color)
-                    angle = math.radians(self.propeller_angle)
-
-                    cos_a = math.cos(angle)
-                    sin_a = math.sin(angle)
-
-                    # Rotation de d1
+                    prop_angle = math.radians(self.propeller_angle)
+                    cos_a = math.cos(prop_angle)
+                    sin_a = math.sin(prop_angle)
                     old_d1x = d1x
                     old_d1y = d1y
                     d1x = old_d1x * cos_a - old_d1y * sin_a
                     d1y = old_d1x * sin_a + old_d1y * cos_a
-
-                    # Rotation de d2
                     old_d2x = d2x
                     old_d2y = d2y
                     d2x = old_d2x * cos_a - old_d2y * sin_a
@@ -162,7 +176,6 @@ class Visualizer:
                     pygame.draw.line(screen, x_color,
                                       (end_x - d2x * prop_size, end_y - d2y * prop_size),
                                       (end_x + d2x * prop_size, end_y + d2y * prop_size), prop_width)
-
                     pygame.draw.circle(screen, x_color, (end_x, end_y), circle_radius)
                 pygame.draw.circle(screen, color, (cx, cy), 18)
                 pygame.draw.circle(screen, (200, 200, 208), (cx, cy), 13)
@@ -183,23 +196,30 @@ class Visualizer:
         if connection is None:
             return True
         return link_usage.get(id(connection), 0) < connection.max_link_capacity
-    #name fonction check linj_usage
+    
+    #chcek cette
     def try_move_drone(self, drone, link_usage):
         next_zone = drone.next_zone
         if next_zone is None:
+            drone.anim_from = drone.current_zone
+            drone.anim_to = drone.current_zone
             return False
         if self.can_enter_zone(next_zone) is False:
+            drone.anim_from = drone.current_zone
+            drone.anim_to = drone.current_zone
             return False
-        #check cette
         connection = self.graph.get_connection(drone.current_zone, next_zone)
         if self.can_use_link(connection, link_usage) is False:
+            drone.anim_from = drone.current_zone
+            drone.anim_to = drone.current_zone
             return False
         self.zone_occupancy[drone.current_zone] -= 1
         self.zone_occupancy[next_zone] += 1
-        ##check cette
         if connection is not None:
             link_usage[id(connection)] = link_usage.get(id(connection), 0) + 1
+        drone.anim_from = drone.current_zone
         drone.path_index += 1
+        drone.anim_to = drone.current_zone
         return True
 
     def run(self):
@@ -261,6 +281,13 @@ class Visualizer:
                     capacity_surface = font_small.render(capacity_text, True, (200, 200, 200))
                     capacity_rect = capacity_surface.get_rect(center=[sx, sy + 110])
                     screen.blit(capacity_surface, capacity_rect)
-            self.draw_drones(screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font_small)
+            #check cette
+            elapsed = now - self.last_move_time
+            travel_duration = self.move_interval * self.travel_ratio
+            if elapsed < travel_duration:
+                t = elapsed / travel_duration
+            else:
+                t = 1.0
+            self.draw_drones(screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font_small, t)
             pygame.display.flip()
         pygame.quit()
