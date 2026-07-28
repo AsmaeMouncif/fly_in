@@ -22,7 +22,7 @@ class Visualizer:
         for name in self.graph.zones:
             self.zone_occupancy[name] = 0
         self.zone_occupancy[start_hub_name] = nb_drones
-        # self.path_index = 0
+        self.path_index = 0
         # self.padding = 100
         # self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
         # self.move_interval = 1500
@@ -184,7 +184,6 @@ class Visualizer:
             return False
         if self.can_enter_zone(next_zone) is False:
             return False
-        #check cette
         connection = self.graph.get_connection(drone.current_zone, next_zone)
         if self.can_use_link(connection, link_usage) is False:
             return False
