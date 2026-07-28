@@ -18,7 +18,9 @@ class Visualizer:
         else:
             self.path = [start_hub_name]
         self.last_move_time = 0
-        self.zone_occupancy = {name: 0 for name in self.graph.zones}
+        self.zone_occupancy = {}
+        for name in self.graph.zones:
+            self.zone_occupancy[name] = 0
         self.zone_occupancy[start_hub_name] = nb_drones
         # self.path_index = 0
         # self.padding = 100
