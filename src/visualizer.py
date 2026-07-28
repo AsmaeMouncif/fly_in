@@ -178,24 +178,23 @@ class Visualizer:
             return True
         return link_usage.get(id(connection), 0) < connection.max_link_capacity
 
-    #name fonction check linj_usage
-    # def try_move_drone(self, drone, link_usage):
-    #     next_zone = drone.next_zone
-    #     if next_zone is None:
-    #         return False
-    #     if self.can_enter_zone(next_zone) is False:
-    #         return False
-    #     #check cette
-    #     connection = self.graph.get_connection(drone.current_zone, next_zone)
-    #     if self.can_use_link(connection, link_usage) is False:
-    #         return False
-    #     self.zone_occupancy[drone.current_zone] -= 1
-    #     self.zone_occupancy[next_zone] += 1
-    #     ##check cette
-    #     if connection is not None:
-    #         link_usage[id(connection)] = link_usage.get(id(connection), 0) + 1
-    #     drone.path_index += 1
-    #     return True
+    def try_move_drone(self, drone, link_usage):
+        next_zone = drone.next_zone
+        if next_zone is None:
+            return False
+        if self.can_enter_zone(next_zone) is False:
+            return False
+        #check cette
+        connection = self.graph.get_connection(drone.current_zone, next_zone)
+        if self.can_use_link(connection, link_usage) is False:
+            return False
+        self.zone_occupancy[drone.current_zone] -= 1
+        self.zone_occupancy[next_zone] += 1
+        ##check cette
+        if connection is not None:
+            link_usage[id(connection)] = link_usage.get(id(connection), 0) + 1
+        drone.path_index += 1
+        return True
 
     def run(self):
         pygame.init()
