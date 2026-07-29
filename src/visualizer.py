@@ -197,31 +197,31 @@ class Visualizer:
         drone.path_index += 1
         return True
 
-    # def all_delivered(self):
-    #     for drone in self.drones:
-    #         if drone.current_zone != self.end_hub_name:
-    #             return False
-    #     return True
+    def all_delivered(self):
+        for drone in self.drones:
+            if drone.current_zone != self.end_hub_name:
+                return False
+        return True
 
-    # def step(self):
-    #     if self.all_delivered():
-    #         return
-    #     link_usage = {}
-    #     moved_this_turn = []
-    #     for drone in self.drones:
-    #         if drone.current_zone == self.end_hub_name:
-    #             continue
-    #         destination = drone.next_zone
-    #         if destination is None:
-    #             continue
-    #         moved = self.try_move_drone(drone, link_usage)
-    #         if moved:
-    #             moved_this_turn.append(f"D{drone.drone_id + 1}-{destination}")
-    #     self.turn_count += 1
-    #     if moved_this_turn:
-    #         print(" ".join(moved_this_turn))
-    #     if self.all_delivered():
-    #         print(f"All drones delivered in {self.turn_count} turns.")
+    def step(self):
+        if self.all_delivered():
+            return
+        link_usage = {}
+        moved_this_turn = []
+        for drone in self.drones:
+            if drone.current_zone == self.end_hub_name:
+                continue
+            destination = drone.next_zone
+            if destination is None:
+                continue
+            moved = self.try_move_drone(drone, link_usage)
+            if moved:
+                moved_this_turn.append(f"D{drone.drone_id + 1}-{destination}")
+        self.turn_count += 1
+        if moved_this_turn:
+            print(" ".join(moved_this_turn))
+        if self.all_delivered():
+            print(f"All drones delivered in {self.turn_count} turns.")
 
     def run(self):
         pygame.init()
