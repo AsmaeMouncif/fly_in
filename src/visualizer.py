@@ -28,6 +28,7 @@ class Visualizer:
         # self.move_interval = 1500
         # self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
         # self.propeller_angle = 0
+        # self.turn_count = 0
 
     def reset(self):
         self.zone_occupancy = {}
@@ -39,6 +40,7 @@ class Visualizer:
             drone = Drone(self.path, drone_id=i)
             self.drones.append(drone)
         self.last_move_time = pygame.time.get_ticks()
+        # self.turn_count = 0
 
     def compute_bounds(self):
         min_x = None
@@ -56,21 +58,21 @@ class Visualizer:
                 max_y = zone.y
         return min_x, max_x, min_y, max_y
 
-    # def to_screen_coords(self, x, y, screen_width, screen_height,
-    #                      min_x, max_x, min_y, max_y):
-    #     range_x = max_x - min_x
-    #     range_y = max_y - min_y
-    #     if range_x == 0:
-    #         range_x = 1
-    #     if range_y == 0:
-    #         range_y = 1
-    #     proportion_x = (x - min_x) / range_x
-    #     proportion_y = (y - min_y) / range_y
-    #     usable_width = screen_width - 2 * self.padding
-    #     usable_height = screen_height - 2 * self.padding
-    #     screen_x = self.padding + proportion_x * usable_width
-    #     screen_y = self.padding + proportion_y * usable_height
-    #     return int(screen_x), int(screen_y)
+    def to_screen_coords(self, x, y, screen_width, screen_height,
+                         min_x, max_x, min_y, max_y):
+        range_x = max_x - min_x
+        range_y = max_y - min_y
+        if range_x == 0:
+            range_x = 1
+        if range_y == 0:
+            range_y = 1
+        proportion_x = (x - min_x) / range_x
+        proportion_y = (y - min_y) / range_y
+        usable_width = screen_width - 2 * self.padding
+        usable_height = screen_height - 2 * self.padding
+        screen_x = self.padding + proportion_x * usable_width
+        screen_y = self.padding + proportion_y * usable_height
+        return int(screen_x), int(screen_y)
 
     def draw_connections(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
         for connection in self.graph.connections:
@@ -195,6 +197,32 @@ class Visualizer:
         drone.path_index += 1
         return True
 
+    # def all_delivered(self):
+    #     for drone in self.drones:
+    #         if drone.current_zone != self.end_hub_name:
+    #             return False
+    #     return True
+
+    # def step(self):
+    #     if self.all_delivered():
+    #         return
+    #     link_usage = {}
+    #     moved_this_turn = []
+    #     for drone in self.drones:
+    #         if drone.current_zone == self.end_hub_name:
+    #             continue
+    #         destination = drone.next_zone
+    #         if destination is None:
+    #             continue
+    #         moved = self.try_move_drone(drone, link_usage)
+    #         if moved:
+    #             moved_this_turn.append(f"D{drone.drone_id + 1}-{destination}")
+    #     self.turn_count += 1
+    #     if moved_this_turn:
+    #         print(" ".join(moved_this_turn))
+    #     if self.all_delivered():
+    #         print(f"All drones delivered in {self.turn_count} turns.")
+
     def run(self):
         pygame.init()
         screen = pygame.display.set_mode((1100, 600), pygame.RESIZABLE)
@@ -222,9 +250,7 @@ class Visualizer:
             # cette
             # now = pygame.time.get_ticks()
             # if now - self.last_move_time >= self.move_interval:
-            #     link_usage = {}
-            #     for drone in self.drones:
-            #         self.try_move_drone(drone, link_usage)
+            #     self.step()
             #     self.last_move_time = now
             # self.propeller_angle += 0.5
             # if self.propeller_angle >= 360:
