@@ -168,7 +168,7 @@ class Visualizer:
     #             label_surface = font.render(label_text, True, color)
     #             label_rect = label_surface.get_rect(center=(cx, cy - 28))
     #             screen.blit(label_surface, label_rect)
-        
+
     def can_enter_zone(self, zone_name):
         zone = self.graph.zones[zone_name]
         return self.zone_occupancy[zone_name] < zone.max_drones
