@@ -23,12 +23,12 @@ class Visualizer:
             self.zone_occupancy[name] = 0
         self.zone_occupancy[start_hub_name] = nb_drones
         self.path_index = 0
+        self.turn_count = 0
         # self.padding = 100
         # self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
         # self.move_interval = 1500
         # self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
         # self.propeller_angle = 0
-        # self.turn_count = 0
 
     def reset(self):
         self.zone_occupancy = {}
@@ -40,7 +40,7 @@ class Visualizer:
             drone = Drone(self.path, drone_id=i)
             self.drones.append(drone)
         self.last_move_time = pygame.time.get_ticks()
-        # self.turn_count = 0
+        self.turn_count = 0
 
     def compute_bounds(self):
         min_x = None
