@@ -120,13 +120,13 @@ class Visualizer:
                 angle = math.radians(angle_deg)
                 cx = sx + math.cos(angle) * 55
                 cy = sy + math.sin(angle) * 55
-                arm_ends = [
+                drone_arms = [
                     (cx - 11, cy - 11, cx - 31, cy - 31),
                     (cx + 11, cy - 11, cx + 31, cy - 31),
                     (cx - 11, cy + 11, cx - 31, cy + 31),
                     (cx + 11, cy + 11, cx + 31, cy + 31),
                 ]
-                for start_x, start_y, end_x, end_y in arm_ends:
+                for start_x, start_y, end_x, end_y in drone_arms:
                     pygame.draw.line(screen, color, (start_x, start_y), (end_x, end_y), 4)
                     ux, uy = (end_x - start_x, end_y - start_y)
                     length = math.hypot(ux, uy)
