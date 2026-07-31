@@ -101,7 +101,9 @@ class Visualizer:
     def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font):
         drones_by_zone = {}
         for drone in self.drones:
-            drones_by_zone.setdefault(drone.current_zone, []).append(drone)
+            if drone.current_zone not in drones_by_zone:
+                drones_by_zone[drone.current_zone] = []
+            drones_by_zone[drone.current_zone].append(drone)
         for zone_name, drones in drones_by_zone.items():
             zone = self.graph.zones[zone_name]
             sx, sy = self.to_screen_coords(zone.x, zone.y, screen_w, screen_h, min_x, max_x, min_y, max_y)
