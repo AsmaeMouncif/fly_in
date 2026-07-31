@@ -24,11 +24,14 @@ class Visualizer:
         self.zone_occupancy[start_hub_name] = nb_drones
         self.path_index = 0
         self.turn_count = 0
-        # self.padding = 100
-        # self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
-        # self.move_interval = 1500
-        # self.drone_colors = [random.choice(DRONE_COLORS) for _ in range(nb_drones)]
-        # self.propeller_angle = 0
+        self.drone_colors = []
+        for i in range(nb_drones):
+            color = random.choice(DRONE_COLORS)
+            self.drone_colors.append(color)
+        self.padding = 100
+        self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
+        self.move_interval = 1500
+        self.propeller_angle = 0
 
     def reset(self):
         self.zone_occupancy = {}
@@ -58,21 +61,21 @@ class Visualizer:
                 max_y = zone.y
         return min_x, max_x, min_y, max_y
 
-    # def to_screen_coords(self, x, y, screen_width, screen_height,
-    #                      min_x, max_x, min_y, max_y):
-    #     range_x = max_x - min_x
-    #     range_y = max_y - min_y
-    #     if range_x == 0:
-    #         range_x = 1
-    #     if range_y == 0:
-    #         range_y = 1
-    #     proportion_x = (x - min_x) / range_x
-    #     proportion_y = (y - min_y) / range_y
-    #     usable_width = screen_width - 2 * self.padding
-    #     usable_height = screen_height - 2 * self.padding
-    #     screen_x = self.padding + proportion_x * usable_width
-    #     screen_y = self.padding + proportion_y * usable_height
-    #     return int(screen_x), int(screen_y)
+    def to_screen_coords(self, x, y, screen_width, screen_height,
+                         min_x, max_x, min_y, max_y):
+        range_x = max_x - min_x
+        range_y = max_y - min_y
+        if range_x == 0:
+            range_x = 1
+        if range_y == 0:
+            range_y = 1
+        proportion_x = (x - min_x) / range_x
+        proportion_y = (y - min_y) / range_y
+        usable_width = screen_width - 2 * self.padding
+        usable_height = screen_height - 2 * self.padding
+        screen_x = self.padding + proportion_x * usable_width
+        screen_y = self.padding + proportion_y * usable_height
+        return int(screen_x), int(screen_y)
 
     def draw_connections(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
         for connection in self.graph.connections:
@@ -113,7 +116,8 @@ class Visualizer:
             count = len(drones)
             for i, drone in enumerate(drones):
                 color = self.drone_colors[drone.drone_id]
-                angle = (2 * math.pi / count) * i
+                angle_degre = (360 / count) * i
+                angle = math.radians(angle_degre)
                 cx = sx + math.cos(angle) * 55
                 cy = sy + math.sin(angle) * 55
                 arm_ends = [
@@ -228,13 +232,13 @@ class Visualizer:
                     if event.key == pygame.K_F5:
                         self.reset()
             # cette
-            # now = pygame.time.get_ticks()
-            # if now - self.last_move_time >= self.move_interval:
-            #     self.step()
-            #     self.last_move_time = now
-            # self.propeller_angle += 0.5
-            # if self.propeller_angle >= 360:
-            #     self.propeller_angle = 0
+            now = pygame.time.get_ticks()
+            if now - self.last_move_time >= self.move_interval:
+                self.step()
+                self.last_move_time = now
+            self.propeller_angle += 0.5
+            if self.propeller_angle >= 360:
+                self.propeller_angle = 0
             self.draw_connections(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
             for zone in self.graph.zones.values():
                 sx, sy = self.to_screen_coords(
