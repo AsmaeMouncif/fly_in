@@ -106,7 +106,10 @@ class Visualizer:
             drones_by_zone[drone.current_zone].append(drone)
         for zone_name, drones in drones_by_zone.items():
             zone = self.graph.zones[zone_name]
-            sx, sy = self.to_screen_coords(zone.x, zone.y, screen_w, screen_h, min_x, max_x, min_y, max_y)
+            sx, sy = self.to_screen_coords(
+                zone.x, zone.y, screen_w, screen_h,
+                min_x, max_x, min_y, max_y
+            )
             count = len(drones)
             for i, drone in enumerate(drones):
                 color = self.drone_colors[drone.drone_id]
