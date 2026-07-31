@@ -116,8 +116,8 @@ class Visualizer:
             count = len(drones)
             for i, drone in enumerate(drones):
                 color = self.drone_colors[drone.drone_id]
-                angle_degre = (360 / count) * i
-                angle = math.radians(angle_degre)
+                angle_deg = (360 / count) * i
+                angle = math.radians(angle_deg)
                 cx = sx + math.cos(angle) * 55
                 cy = sy + math.sin(angle) * 55
                 arm_ends = [
