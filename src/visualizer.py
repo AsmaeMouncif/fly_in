@@ -1,10 +1,10 @@
+from .drone import Drone
+from .colors import DRONE_COLORS
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
 import math
 import random
-from .drone import Drone
-from .colors import DRONE_COLORS
 
 
 class Visualizer:
