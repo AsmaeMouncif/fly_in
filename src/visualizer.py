@@ -130,23 +130,23 @@ class Visualizer:
                     pygame.draw.line(screen, color, (start_x, start_y), (end_x, end_y), 4)
                     ux = end_x - start_x
                     uy = end_y - start_y
-                    length = math.hypot(ux, uy)
-                    ux, uy = ux / length, uy / length
-                    px, py = -uy, ux
-                    d1x, d1y = ux + px * 0.5, uy + py * 0.5
-                    d2x, d2y = ux - px * 0.5, uy - py * 0.5
-                    d1x, d1y = d1x / math.hypot(d1x, d1y), d1y / math.hypot(d1x, d1y)
-                    d2x, d2y = d2x / math.hypot(d2x, d2y), d2y / math.hypot(d2x, d2y)
-                    cos_a = math.cos(math.radians(self.propeller_angle))
-                    sin_a = math.sin(math.radians(self.propeller_angle))
-                    d1x, d1y = d1x * cos_a - d1y * sin_a, d1x * sin_a + d1y * cos_a
-                    d2x, d2y = d2x * cos_a - d2y * sin_a, d2x * sin_a + d2y * cos_a
-                    pygame.draw.line(screen, (200, 200, 200),
-                                    (end_x - d1x * 10, end_y - d1y * 10),
-                                    (end_x + d1x * 10, end_y + d1y * 10), 2)
-                    pygame.draw.line(screen, (200, 200, 200),
-                                    (end_x - d2x * 10, end_y - d2y * 10),
-                                    (end_x + d2x * 10, end_y + d2y * 10), 2)
+                    length = math.sqrt(ux * ux + uy * uy)
+                    # ux, uy = ux / length, uy / length
+                    # px, py = -uy, ux
+                    # d1x, d1y = ux + px * 0.5, uy + py * 0.5
+                    # d2x, d2y = ux - px * 0.5, uy - py * 0.5
+                    # d1x, d1y = d1x / math.hypot(d1x, d1y), d1y / math.hypot(d1x, d1y)
+                    # d2x, d2y = d2x / math.hypot(d2x, d2y), d2y / math.hypot(d2x, d2y)
+                    # cos_a = math.cos(math.radians(self.propeller_angle))
+                    # sin_a = math.sin(math.radians(self.propeller_angle))
+                    # d1x, d1y = d1x * cos_a - d1y * sin_a, d1x * sin_a + d1y * cos_a
+                    # d2x, d2y = d2x * cos_a - d2y * sin_a, d2x * sin_a + d2y * cos_a
+                    # pygame.draw.line(screen, (200, 200, 200),
+                    #                 (end_x - d1x * 10, end_y - d1y * 10),
+                    #                 (end_x + d1x * 10, end_y + d1y * 10), 2)
+                    # pygame.draw.line(screen, (200, 200, 200),
+                    #                 (end_x - d2x * 10, end_y - d2y * 10),
+                    #                 (end_x + d2x * 10, end_y + d2y * 10), 2)
                     pygame.draw.circle(screen, (200, 200, 200), (end_x, end_y), 3)
                 pygame.draw.circle(screen, color, (cx, cy), 18)
                 pygame.draw.circle(screen, (200, 200, 200), (cx, cy), 13)
@@ -232,14 +232,13 @@ class Visualizer:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_F5:
                         self.reset()
-            # cette
-            # now = pygame.time.get_ticks()
-            # if now - self.last_move_time >= self.move_interval:
-            #     self.step()
-            #     self.last_move_time = now
-            # self.propeller_angle += 0.5
-            # if self.propeller_angle >= 360:
-            #     self.propeller_angle = 0
+            now = pygame.time.get_ticks()
+            if now - self.last_move_time >= self.move_interval:
+                self.step()
+                self.last_move_time = now
+            self.propeller_angle += 0.5
+            if self.propeller_angle >= 360:
+                self.propeller_angle = 0
             self.draw_connections(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
             for zone in self.graph.zones.values():
                 sx, sy = self.to_screen_coords(
