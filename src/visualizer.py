@@ -128,7 +128,8 @@ class Visualizer:
                 ]
                 for start_x, start_y, end_x, end_y in drone_arms:
                     pygame.draw.line(screen, color, (start_x, start_y), (end_x, end_y), 4)
-                    ux, uy = (end_x - start_x, end_y - start_y)
+                    ux = end_x - start_x
+                    uy = end_y - start_y
                     length = math.hypot(ux, uy)
                     ux, uy = ux / length, uy / length
                     px, py = -uy, ux
