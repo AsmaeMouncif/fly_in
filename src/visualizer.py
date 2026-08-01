@@ -233,12 +233,12 @@ class Visualizer:
                     if event.key == pygame.K_F5:
                         self.reset()
             now = pygame.time.get_ticks()
-            if now - self.last_move_time >= self.move_interval:
-                self.step()
-                self.last_move_time = now
-            self.propeller_angle += 0.5
-            if self.propeller_angle >= 360:
-                self.propeller_angle = 0
+            # if now - self.last_move_time >= self.move_interval:
+            #     self.step()
+            #     self.last_move_time = now
+            # self.propeller_angle += 0.5
+            # if self.propeller_angle >= 360:
+            #     self.propeller_angle = 0
             self.draw_connections(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
             for zone in self.graph.zones.values():
                 sx, sy = self.to_screen_coords(
