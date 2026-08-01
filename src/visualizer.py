@@ -148,7 +148,7 @@ class Visualizer:
                                     (end_x + d2x * 10, end_y + d2y * 10), 2)
                     pygame.draw.circle(screen, (200, 200, 200), (end_x, end_y), 3)
                 pygame.draw.circle(screen, color, (cx, cy), 18)
-                pygame.draw.circle(screen, (200, 200, 208), (cx, cy), 13)
+                pygame.draw.circle(screen, (200, 200, 200), (cx, cy), 13)
                 label_text = f"D{drone.drone_id + 1}"
                 shadow = font.render(label_text, True, (0, 0, 0))
                 screen.blit(shadow, shadow.get_rect(center=(cx + 2, cy - 26)))
