@@ -1,11 +1,11 @@
-from .zone import Zone, DEFAULT_COLOR
+from .zone import Zone, PYGAME_COLORS
 from .connection import Connection
 from .graph import Graph
 import os
 import re
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
-
+import random
 
 class ParserError(Exception):
     pass
@@ -323,5 +323,5 @@ class Parser:
         try:
             pygame.Color(value)
         except ValueError:
-            return DEFAULT_COLOR
+            return random.choice(PYGAME_COLORS)
         return value

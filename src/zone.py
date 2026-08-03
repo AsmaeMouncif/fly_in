@@ -2,7 +2,7 @@ import random
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
-DEFAULT_COLOR = list(pygame.color.THECOLORS.keys())
+PYGAME_COLORS = list(pygame.color.THECOLORS.keys())
 
 
 class Zone:
@@ -11,5 +11,5 @@ class Zone:
         self.x = x
         self.y = y
         self.zone_type = "normal"
-        self.color = random.choice(DEFAULT_COLOR)
+        self.color = random.choice(PYGAME_COLORS)
         self.max_drones = 1
