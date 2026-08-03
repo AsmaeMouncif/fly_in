@@ -148,9 +148,12 @@ class Parser:
         metadata = None
         if "[" in data:
             zone_data, metadata = data.split("[", 1)
-            if not metadata.strip().endswith("]"):
+            if not metadata.endswith("]"):
                 raise ParserError("Invalid metadata format")
-            metadata = metadata.strip().rstrip("]")
+            content = metadata[:-1]
+            if content != content.strip():
+                raise ParserError("Spaces inside metadata are not allowed")
+            metadata = content
         else:
             zone_data = data
         zone_data = zone_data.strip().split()
@@ -175,9 +178,12 @@ class Parser:
         metadata = None
         if "[" in data:
             zone_data, metadata = data.split("[", 1)
-            if not metadata.strip().endswith("]"):
+            if not metadata.endswith("]"):
                 raise ParserError("Invalid metadata format")
-            metadata = metadata.strip().rstrip("]")
+            content = metadata[:-1]
+            if content != content.strip():
+                raise ParserError("Spaces inside metadata are not allowed")
+            metadata = content
         else:
             zone_data = data
         zone_data = zone_data.strip().split()
@@ -200,9 +206,12 @@ class Parser:
         metadata = None
         if "[" in data:
             zone_data, metadata = data.split("[", 1)
-            if not metadata.strip().endswith("]"):
+            if not metadata.endswith("]"):
                 raise ParserError("Invalid metadata format")
-            metadata = metadata.strip().rstrip("]")
+            content = metadata[:-1]
+            if content != content.strip():
+                raise ParserError("Spaces inside metadata are not allowed")
+            metadata = content
         else:
             zone_data = data
         zone_data = zone_data.strip().split()
