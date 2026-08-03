@@ -152,7 +152,7 @@ class Parser:
                 raise ParserError("Invalid metadata format")
             content = metadata[:-1]
             if content != content.strip():
-                raise ParserError("Spaces inside metadata are not allowed")
+                raise ParserError("Invalid metadata format")
             metadata = content
         else:
             zone_data = data
@@ -182,7 +182,7 @@ class Parser:
                 raise ParserError("Invalid metadata format")
             content = metadata[:-1]
             if content != content.strip():
-                raise ParserError("Spaces inside metadata are not allowed")
+                raise ParserError("Invalid metadata format")
             metadata = content
         else:
             zone_data = data
@@ -210,7 +210,7 @@ class Parser:
                 raise ParserError("Invalid metadata format")
             content = metadata[:-1]
             if content != content.strip():
-                raise ParserError("Spaces inside metadata are not allowed")
+                raise ParserError("Invalid metadata format")
             metadata = content
         else:
             zone_data = data
