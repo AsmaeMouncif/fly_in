@@ -28,10 +28,10 @@ class Visualizer:
         for i in range(nb_drones):
             color = random.choice(DRONE_COLORS)
             self.drone_colors.append(color)
-        self.padding = 100
-        self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
-        self.move_interval = 1500
-        self.propeller_angle = 0
+        # self.padding = 100
+        # self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
+        # self.move_interval = 1500
+        # self.propeller_angle = 0
 
     def reset(self):
         self.zone_occupancy = {}
@@ -131,23 +131,23 @@ class Visualizer:
                     ux = end_x - start_x
                     uy = end_y - start_y
                     length = math.sqrt(ux * ux + uy * uy)
-                    ux, uy = ux / length, uy / length
-                    px, py = -uy, ux
-                    d1x, d1y = ux + px * 0.5, uy + py * 0.5
-                    d2x, d2y = ux - px * 0.5, uy - py * 0.5
-                    d1x, d1y = d1x / math.hypot(d1x, d1y), d1y / math.hypot(d1x, d1y)
-                    d2x, d2y = d2x / math.hypot(d2x, d2y), d2y / math.hypot(d2x, d2y)
-                    cos_a = math.cos(math.radians(self.propeller_angle))
-                    sin_a = math.sin(math.radians(self.propeller_angle))
-                    d1x, d1y = d1x * cos_a - d1y * sin_a, d1x * sin_a + d1y * cos_a
-                    d2x, d2y = d2x * cos_a - d2y * sin_a, d2x * sin_a + d2y * cos_a
-                    pygame.draw.line(screen, (200, 200, 200),
-                                    (end_x - d1x * 10, end_y - d1y * 10),
-                                    (end_x + d1x * 10, end_y + d1y * 10), 2)
-                    pygame.draw.line(screen, (200, 200, 200),
-                                    (end_x - d2x * 10, end_y - d2y * 10),
-                                    (end_x + d2x * 10, end_y + d2y * 10), 2)
-                    pygame.draw.circle(screen, (200, 200, 200), (end_x, end_y), 3)
+                    # ux, uy = ux / length, uy / length
+                    # px, py = -uy, ux
+                    # d1x, d1y = ux + px * 0.5, uy + py * 0.5
+                    # d2x, d2y = ux - px * 0.5, uy - py * 0.5
+                    # d1x, d1y = d1x / math.hypot(d1x, d1y), d1y / math.hypot(d1x, d1y)
+                    # d2x, d2y = d2x / math.hypot(d2x, d2y), d2y / math.hypot(d2x, d2y)
+                    # cos_a = math.cos(math.radians(self.propeller_angle))
+                    # sin_a = math.sin(math.radians(self.propeller_angle))
+                    # d1x, d1y = d1x * cos_a - d1y * sin_a, d1x * sin_a + d1y * cos_a
+                    # d2x, d2y = d2x * cos_a - d2y * sin_a, d2x * sin_a + d2y * cos_a
+                    # pygame.draw.line(screen, (200, 200, 200),
+                    #                 (end_x - d1x * 10, end_y - d1y * 10),
+                    #                 (end_x + d1x * 10, end_y + d1y * 10), 2)
+                    # pygame.draw.line(screen, (200, 200, 200),
+                    #                 (end_x - d2x * 10, end_y - d2y * 10),
+                    #                 (end_x + d2x * 10, end_y + d2y * 10), 2)
+                    # pygame.draw.circle(screen, (200, 200, 200), (end_x, end_y), 3)
                 pygame.draw.circle(screen, color, (cx, cy), 18)
                 pygame.draw.circle(screen, (200, 200, 200), (cx, cy), 13)
                 label_text = f"D{drone.drone_id + 1}"
@@ -234,12 +234,12 @@ class Visualizer:
                         if event.key == pygame.K_F5:
                             self.reset()
                 now = pygame.time.get_ticks()
-                if now - self.last_move_time >= self.move_interval:
-                    self.step()
-                    self.last_move_time = now
-                self.propeller_angle += 0.5
-                if self.propeller_angle >= 360:
-                    self.propeller_angle = 0
+                # if now - self.last_move_time >= self.move_interval:
+                #     self.step()
+                #     self.last_move_time = now
+                # self.propeller_angle += 0.5
+                # if self.propeller_angle >= 360:
+                #     self.propeller_angle = 0
                 self.draw_connections(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
                 for zone in self.graph.zones.values():
                     sx, sy = self.to_screen_coords(
