@@ -61,21 +61,21 @@ class Visualizer:
                 max_y = zone.y
         return min_x, max_x, min_y, max_y
 
-    # def to_screen_coords(self, x, y, screen_width, screen_height,
-    #                      min_x, max_x, min_y, max_y):
-    #     range_x = max_x - min_x
-    #     range_y = max_y - min_y
-    #     if range_x == 0:
-    #         range_x = 1
-    #     if range_y == 0:
-    #         range_y = 1
-    #     proportion_x = (x - min_x) / range_x
-    #     proportion_y = (y - min_y) / range_y
-    #     usable_width = screen_width - 2 * self.padding
-    #     usable_height = screen_height - 2 * self.padding
-    #     screen_x = self.padding + proportion_x * usable_width
-    #     screen_y = self.padding + proportion_y * usable_height
-    #     return int(screen_x), int(screen_y)
+    def to_screen_coords(self, x, y, screen_width, screen_height,
+                         min_x, max_x, min_y, max_y):
+        range_x = max_x - min_x
+        range_y = max_y - min_y
+        if range_x == 0:
+            range_x = 1
+        if range_y == 0:
+            range_y = 1
+        proportion_x = (x - min_x) / range_x
+        proportion_y = (y - min_y) / range_y
+        usable_width = screen_width - 2 * self.padding
+        usable_height = screen_height - 2 * self.padding
+        screen_x = self.padding + proportion_x * usable_width
+        screen_y = self.padding + proportion_y * usable_height
+        return int(screen_x), int(screen_y)
 
     def draw_connections(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
         for connection in self.graph.connections:
