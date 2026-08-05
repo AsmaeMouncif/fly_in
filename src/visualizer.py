@@ -8,7 +8,8 @@ import random
 
 
 class Visualizer:
-    def __init__(self, graph, start_hub_name=None, end_hub_name=None, nb_drones=0, path=None):
+    def __init__(self, graph, start_hub_name=None,
+                 end_hub_name=None, nb_drones=0, path=None):
         self.graph = graph
         self.start_hub_name = start_hub_name
         self.end_hub_name = end_hub_name
@@ -77,7 +78,8 @@ class Visualizer:
         screen_y = self.padding + proportion_y * usable_height
         return int(screen_x), int(screen_y)
 
-    def draw_connections(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y):
+    def draw_connections(self, screen, screen_w, screen_h,
+                         min_x, max_x, min_y, max_y):
         for connection in self.graph.connections:
             zone1 = self.graph.zones[connection.zone1]
             zone2 = self.graph.zones[connection.zone2]
@@ -94,14 +96,16 @@ class Visualizer:
             distance = math.sqrt(dx * dx + dy * dy)
             if distance == 0:
                 continue
-            #3 lines
+            # 3 lines
             ux = dx / distance
             uy = dy / distance
             start_point = (sx1 + ux * 80, sy1 + uy * 80)
             end_point = (sx2 - ux * 80, sy2 - uy * 80)
-            pygame.draw.line(screen, (200, 200, 200), start_point, end_point, 1)
+            pygame.draw.line(screen, (200, 200, 200),
+                             start_point, end_point, 1)
 
-    def draw_drones(self, screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font):
+    def draw_drones(self, screen, screen_w, screen_h,
+                    min_x, max_x, min_y, max_y, font):
         drones_by_zone = {}
         for drone in self.drones:
             if drone.current_zone not in drones_by_zone:
@@ -127,7 +131,8 @@ class Visualizer:
                     (cx + 11, cy + 11, cx + 31, cy + 31),
                 ]
                 for start_x, start_y, end_x, end_y in drone_arms:
-                    pygame.draw.line(screen, color, (start_x, start_y), (end_x, end_y), 4)
+                    pygame.draw.line(screen, color,
+                                     (start_x, start_y), (end_x, end_y), 4)
                     ux = end_x - start_x
                     uy = end_y - start_y
                     length = math.sqrt(ux * ux + uy * uy)
@@ -177,7 +182,7 @@ class Visualizer:
         self.zone_occupancy[drone.current_zone] -= 1
         self.zone_occupancy[next_zone] += 1
         if connection is not None:
-            #ce line
+            # ce line
             link_usage[id(connection)] = link_usage.get(id(connection), 0) + 1
         drone.path_index += 1
         return True
@@ -240,7 +245,8 @@ class Visualizer:
                 self.propeller_angle += 0.5
                 if self.propeller_angle >= 360:
                     self.propeller_angle = 0
-                self.draw_connections(screen, screen_w, screen_h, min_x, max_x, min_y, max_y)
+                self.draw_connections(screen, screen_w, screen_h,
+                                      min_x, max_x, min_y, max_y)
                 for zone in self.graph.zones.values():
                     sx, sy = self.to_screen_coords(
                         zone.x, zone.y, screen_w, screen_h,

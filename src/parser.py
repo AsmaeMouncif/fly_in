@@ -7,6 +7,7 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
 import random
 
+
 class ParserError(Exception):
     pass
 
@@ -48,7 +49,9 @@ class Parser:
         except PermissionError:
             raise ParserError(f"Permission denied: {self.file_path}")
         except IsADirectoryError:
-            raise ParserError(f"Expected a file, got a directory: {self.file_path}")
+            raise ParserError(
+                f"Expected a file, got a directory: {self.file_path}"
+            )
         except OSError as e:
             raise ParserError(f"Cannot read file {self.file_path}: {e}")
         if not lines:
@@ -56,7 +59,8 @@ class Parser:
         first_line_number, first_content = lines[0]
         if not first_content.startswith("nb_drones:"):
             raise ParserError(
-                f"Line {first_line_number}: nb_drones must be the first line of the file"
+                f"Line {first_line_number}: "
+                "nb_drones must be the first line of the file"
             )
         contents_only = []
         for line_number, content in lines:
@@ -89,9 +93,13 @@ class Parser:
         start_hub = self.zone_objects[self.start_hub_name]
         end_hub = self.zone_objects[self.end_hub_name]
         if start_hub.zone_type == "blocked":
-            raise ParserError(f"Line {self.start_hub_line}: start_hub cannot be blocked")
+            raise ParserError(
+                f"Line {self.start_hub_line}: start_hub cannot be blocked"
+            )
         if end_hub.zone_type == "blocked":
-            raise ParserError(f"Line {self.end_hub_line}: end_hub cannot be blocked")
+            raise ParserError(
+                f"Line {self.end_hub_line}: end_hub cannot be blocked"
+            )
 
     def validate_required_fields(self, lines):
         has_nb_drones = False
