@@ -23,6 +23,8 @@ class Parser:
         self.connection_keys = set()
         self.start_hub_name = None
         self.end_hub_name = None
+        self.start_hub_line = None
+        self.end_hub_line = None
 
     @staticmethod
     def strip_comment(line):
