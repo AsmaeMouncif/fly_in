@@ -64,7 +64,7 @@ class Parser:
         self.validate_required_fields(contents_only)
         for line_number, content in lines:
             try:
-                self.parse_line(content)
+                self.parse_line(content, line_number)
             except ParserError as e:
                 raise ParserError(f"Line {line_number}: {e}") from e
         self.validate_start_end_zone_types()
