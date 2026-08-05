@@ -14,6 +14,7 @@ def main():
     except ParserError as e:
         print(e)
         sys.exit(1)
+    sys.exit()
     pathfinder = Pathfinder(parser.graph)
     _, predecessors = pathfinder.dijkstra(parser.start_hub_name)
     path = pathfinder.reconstruct_path(
