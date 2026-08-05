@@ -109,13 +109,15 @@ class Parser:
         if not has_end_hub:
             raise ParserError("Missing end_hub definition")
 
-    def parse_line(self, line):
+    def parse_line(self, line, line_number):
         if line.startswith("nb_drones:"):
             self.parse_nb_drones(line)
         elif line.startswith("start_hub:"):
             self.parse_start_hub(line)
+            self.start_hub_line = line_number
         elif line.startswith("end_hub:"):
             self.parse_end_hub(line)
+            self.end_hub_line = line_number
         elif line.startswith("hub:"):
             self.parse_hub(line)
         elif line.startswith("connection:"):
