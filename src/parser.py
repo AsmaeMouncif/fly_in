@@ -89,9 +89,9 @@ class Parser:
         start_hub = self.zone_objects[self.start_hub_name]
         end_hub = self.zone_objects[self.end_hub_name]
         if start_hub.zone_type == "blocked":
-            raise ParserError("start_hub cannot be blocked")
+            raise ParserError(f"Line {self.start_hub_line}: start_hub cannot be blocked")
         if end_hub.zone_type == "blocked":
-            raise ParserError("end_hub cannot be blocked")
+            raise ParserError(f"Line {self.end_hub_line}: end_hub cannot be blocked")
 
     def validate_required_fields(self, lines):
         has_nb_drones = False
