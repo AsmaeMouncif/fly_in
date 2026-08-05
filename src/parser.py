@@ -216,14 +216,14 @@ class Parser:
             raise ParserError("Invalid hub format")
         data = parts[1].strip()
         metadata = None
-        if "[" in data:
-            zone_data, metadata = data.split("[", 1)
-            if not metadata.endswith("]"):
+        if data.endswith("]"):
+            pos = data.rfind("[")
+            if pos == -1:
                 raise ParserError("Invalid metadata format")
-            content = metadata[:-1]
-            if content != content.strip():
+            zone_data = data[:pos]
+            metadata = data[pos + 1:-1]
+            if metadata != metadata.strip():
                 raise ParserError("Invalid metadata format")
-            metadata = content
         else:
             zone_data = data
         zone_data = zone_data.strip().split()
