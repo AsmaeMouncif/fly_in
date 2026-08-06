@@ -1,15 +1,16 @@
+from typing import List
 import random
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
-PYGAME_COLORS = list(pygame.color.THECOLORS.keys())
+PYGAME_COLORS: List[str] = list(pygame.color.THECOLORS.keys())
 
 
 class Zone:
-    def __init__(self, name, x, y):
-        self.name = name
-        self.x = x
-        self.y = y
-        self.zone_type = "normal"
-        self.color = random.choice(PYGAME_COLORS)
-        self.max_drones = 1
+    def __init__(self, name: str, x: int, y: int) -> None:
+        self.name: str = name
+        self.x: int = x
+        self.y: int = y
+        self.zone_type: str = "normal"
+        self.color: str = random.choice(PYGAME_COLORS)
+        self.max_drones: int = 1

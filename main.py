@@ -4,7 +4,7 @@ from src.pathfinder import Pathfinder
 from src.visualizer import Visualizer
 
 
-def main():
+def main() -> None:
     if len(sys.argv) != 2:
         print("Please use: 'make run FILE=<path_to_file>'")
         sys.exit(1)
@@ -15,6 +15,8 @@ def main():
         print(e)
         sys.exit(1)
     pathfinder = Pathfinder(parser.graph)
+    assert parser.start_hub_name is not None
+    assert parser.end_hub_name is not None
     _, predecessors = pathfinder.dijkstra(parser.start_hub_name)
     path = pathfinder.reconstruct_path(
         predecessors, parser.start_hub_name, parser.end_hub_name
