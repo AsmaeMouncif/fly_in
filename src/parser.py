@@ -3,9 +3,9 @@ from .connection import Connection
 from .graph import Graph
 import os
 import re
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-import pygame
 import random
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+import pygame  # noqa: E402
 
 
 class ParserError(Exception):
