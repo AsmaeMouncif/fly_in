@@ -242,10 +242,10 @@ class Parser:
         if len(parts) != 2:
             raise ParserError("Invalid connection format")
         data = parts[1].strip()
-        parts = data.split()
-        if len(parts) not in (1, 2):
+        data_parts = data.split()
+        if len(data_parts) not in (1, 2):
             raise ParserError("Invalid connection format")
-        connection = parts[0]
+        connection = data_parts[0]
         zones = connection.split("-")
         if len(zones) != 2:
             raise ParserError("Invalid connection format")
@@ -263,8 +263,8 @@ class Parser:
         if connection_key in self.connection_keys:
             raise ParserError(f"Duplicate connection {zone1}-{zone2}")
         self.connection_keys.add(connection_key)
-        if len(parts) == 2:
-            max_link_capacity = self.parse_connection_metadata(parts[1])
+        if len(data_parts) == 2:
+            max_link_capacity = self.parse_connection_metadata(data_parts[1])
         self.connections.append(Connection(zone1, zone2, max_link_capacity))
 
     def validate_zone_name(self, name: str) -> None:
@@ -287,7 +287,7 @@ class Parser:
     def parse_zone_metadata(self, zone: Zone, metadata: str) -> None:
         allowed_names = ["zone", "color", "max_drones"]
         seen_names = set()
-        metadata = metadata.split()
+        metadata_parts = metadata.split()
         for part in metadata:
             if "=" not in part:
                 raise ParserError("Invalid metadata format")
