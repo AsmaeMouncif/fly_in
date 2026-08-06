@@ -213,6 +213,15 @@ class Visualizer:
         if self.all_delivered():
             print(f"All drones delivered in {self.turn_count} turns.")
 
+    def draw_hint(self, screen, screen_h, font):
+        hint_text = "Press F5 to reset the simulation"
+        shadow_surface = font.render(hint_text, True, (0, 0, 0))
+        shadow_rect = shadow_surface.get_rect(bottomleft=(12, screen_h - 8))
+        screen.blit(shadow_surface, shadow_rect)
+        text_surface = font.render(hint_text, True, (200, 200, 200))
+        text_rect = text_surface.get_rect(bottomleft=(10, screen_h - 10))
+        screen.blit(text_surface, text_rect)
+
     def run(self):
         pygame.init()
         screen = pygame.display.set_mode((1100, 600), pygame.RESIZABLE)
@@ -275,6 +284,7 @@ class Visualizer:
                         capacity_rect = capacity_surface.get_rect(center=[sx, sy + 110])
                         screen.blit(capacity_surface, capacity_rect)
                 self.draw_drones(screen, screen_w, screen_h, min_x, max_x, min_y, max_y, font_small)
+                self.draw_hint(screen, screen_h, font_small)
                 pygame.display.flip()
         except KeyboardInterrupt:
             print("\033[H\033[J", end="")
