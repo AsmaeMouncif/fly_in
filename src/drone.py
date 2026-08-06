@@ -1,9 +1,6 @@
-from typing import List
-
-
 class Drone:
-    def __init__(self, path: List[str], drone_id: int = 0) -> None:
-        self.path: List[str] = path
+    def __init__(self, path: list[str], drone_id: int = 0) -> None:
+        self.path: list[str] = path
         self.path_index: int = 0
         self.drone_id: int = drone_id
 

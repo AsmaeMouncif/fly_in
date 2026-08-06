@@ -1,4 +1,4 @@
-DRONE_COLORS = [
+DRONE_COLORS: list[tuple[int, int, int]] = [
     (205, 92, 92),
     (240, 128, 128),
     (250, 128, 114),

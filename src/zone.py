@@ -1,9 +1,8 @@
-from typing import List
 import random
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
-PYGAME_COLORS: List[str] = list(pygame.color.THECOLORS.keys())
+PYGAME_COLORS: list[str] = list(pygame.color.THECOLORS.keys())
 
 
 class Zone:
