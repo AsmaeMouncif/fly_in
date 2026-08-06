@@ -13,8 +13,8 @@ class ParserError(Exception):
 
 
 class Parser:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self, file_path: str) -> None:
+        self.file_path: str = file_path
         self.nb_drones_defined = False
         self.start_hub_defined = False
         self.end_hub_defined = False
@@ -28,14 +28,14 @@ class Parser:
         self.end_hub_line = None
 
     @staticmethod
-    def strip_comment(line):
+    def strip_comment(line: str) -> str:
         line = line.strip()
         if line.startswith("#"):
             return ""
         line = re.split(r"\s+#", line, maxsplit=1)[0]
         return line.strip()
 
-    def parse_file(self):
+    def parse_file(self) -> None:
         try:
             with open(self.file_path, "r") as file:
                 lines = []
@@ -75,7 +75,7 @@ class Parser:
         self.ignore_start_end_max_drones()
         self.graph = self.build_graph()
 
-    def build_graph(self):
+    def build_graph(self) -> Graph:
         graph = Graph()
         for zone in self.zone_objects.values():
             graph.add_zone(zone)
@@ -83,13 +83,13 @@ class Parser:
             graph.add_connection(connection)
         return graph
 
-    def ignore_start_end_max_drones(self):
+    def ignore_start_end_max_drones(self) -> None:
         if self.start_hub_name is not None:
             self.zone_objects[self.start_hub_name].max_drones = self.nb_drones
         if self.end_hub_name is not None:
             self.zone_objects[self.end_hub_name].max_drones = self.nb_drones
 
-    def validate_start_end_zone_types(self):
+    def validate_start_end_zone_types(self) -> None:
         start_hub = self.zone_objects[self.start_hub_name]
         end_hub = self.zone_objects[self.end_hub_name]
         if start_hub.zone_type == "blocked":
@@ -101,7 +101,7 @@ class Parser:
                 f"Line {self.end_hub_line}: end_hub cannot be blocked"
             )
 
-    def validate_required_fields(self, lines):
+    def validate_required_fields(self, lines: list[str]) -> None:
         has_nb_drones = False
         has_start_hub = False
         has_end_hub = False
@@ -119,7 +119,7 @@ class Parser:
         if not has_end_hub:
             raise ParserError("Missing end_hub definition")
 
-    def parse_line(self, line, line_number):
+    def parse_line(self, line: str, line_number: int) -> None:
         if line.startswith("nb_drones:"):
             self.parse_nb_drones(line)
         elif line.startswith("start_hub:"):
@@ -135,7 +135,7 @@ class Parser:
         else:
             raise ParserError(f"Unknown line {line}")
 
-    def parse_nb_drones(self, line):
+    def parse_nb_drones(self, line: str) -> None:
         if self.nb_drones_defined:
             raise ParserError("nb_drones defined multiple times")
         parts = line.split(":")
@@ -150,7 +150,7 @@ class Parser:
         self.nb_drones = nb_drones
         self.nb_drones_defined = True
 
-    def parse_start_hub(self, line):
+    def parse_start_hub(self, line: str) -> None:
         if self.start_hub_defined:
             raise ParserError("start_hub defined multiple times")
         parts = line.split(":", 1)
@@ -180,7 +180,7 @@ class Parser:
             self.parse_zone_metadata(zone, metadata)
         self.start_hub_defined = True
 
-    def parse_end_hub(self, line):
+    def parse_end_hub(self, line: str) -> None:
         if self.end_hub_defined:
             raise ParserError("end_hub defined multiple times")
         parts = line.split(":", 1)
@@ -210,7 +210,7 @@ class Parser:
             self.parse_zone_metadata(zone, metadata)
         self.end_hub_defined = True
 
-    def parse_hub(self, line):
+    def parse_hub(self, line: str) -> None:
         parts = line.split(":", 1)
         if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid hub format")
@@ -236,7 +236,7 @@ class Parser:
         if metadata is not None:
             self.parse_zone_metadata(zone, metadata)
 
-    def parse_connection(self, line):
+    def parse_connection(self, line: str) -> None:
         max_link_capacity = 1
         parts = line.split(":", 1)
         if len(parts) != 2:
@@ -267,7 +267,7 @@ class Parser:
             max_link_capacity = self.parse_connection_metadata(parts[1])
         self.connections.append(Connection(zone1, zone2, max_link_capacity))
 
-    def validate_zone_name(self, name):
+    def validate_zone_name(self, name: str) -> None:
         if "-" in name:
             raise ParserError("Zone name cannot contain dashes")
         if " " in name:
@@ -276,15 +276,15 @@ class Parser:
             raise ParserError(f"Zone name already used {name}")
         self.zones.add(name)
 
-    def validate_coordinates(self, x, y):
+    def validate_coordinates(self, x: str, y: str) -> tuple[int, int]:
         try:
-            x = int(x)
-            y = int(y)
+            x_int = int(x)
+            y_int = int(y)
         except ValueError:
             raise ParserError("Invalid coordinate values")
-        return x, y
+        return x_int, y_int
 
-    def parse_zone_metadata(self, zone, metadata):
+    def parse_zone_metadata(self, zone: Zone, metadata: str) -> None:
         allowed_names = ["zone", "color", "max_drones"]
         seen_names = set()
         metadata = metadata.split()
@@ -313,7 +313,7 @@ class Parser:
                     raise ParserError("Invalid max_drones value")
                 zone.max_drones = value
 
-    def parse_connection_metadata(self, metadata):
+    def parse_connection_metadata(self, metadata: str) -> int:
         if not metadata.startswith("[") or not metadata.endswith("]"):
             raise ParserError(f"Invalid metadata block {metadata}")
         content = metadata[1:-1]
@@ -331,7 +331,7 @@ class Parser:
             raise ParserError("Invalid max_link_capacity value")
         return max_link_capacity
 
-    def validate_color(self, value):
+    def validate_color(self, value: str) -> str:
         try:
             pygame.Color(value)
         except ValueError:

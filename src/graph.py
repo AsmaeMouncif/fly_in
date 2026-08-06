@@ -1,6 +1,5 @@
 from .zone import Zone
 from .connection import Connection
-from typing import List
 
 
 class Graph:
@@ -18,7 +17,7 @@ class Graph:
         self.adjacency[connection.zone1].append(connection)
         self.adjacency[connection.zone2].append(connection)
 
-    def neighbors(self, zone_name: str) -> :
+    def neighbors(self, zone_name: str):
         return self.adjacency.get(zone_name, [])
 
     def get_connection(self, zone1, zone2):
