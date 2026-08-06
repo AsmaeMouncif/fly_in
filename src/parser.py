@@ -15,17 +15,19 @@ class ParserError(Exception):
 class Parser:
     def __init__(self, file_path: str) -> None:
         self.file_path: str = file_path
-        self.nb_drones_defined = False
-        self.start_hub_defined = False
-        self.end_hub_defined = False
-        self.zones = set()
-        self.zone_objects = {}
-        self.connections = []
-        self.connection_keys = set()
-        self.start_hub_name = None
-        self.end_hub_name = None
-        self.start_hub_line = None
-        self.end_hub_line = None
+        self.nb_drones_defined: bool = False
+        self.start_hub_defined: bool = False
+        self.end_hub_defined: bool = False
+        self.zones: set[str] = set()
+        self.zone_objects: dict[str, Zone] = {}
+        self.connections: list[Connection] = []
+        self.connection_keys: set[frozenset] = set()
+        self.start_hub_name: str | None = None
+        self.end_hub_name: str | None = None
+        self.start_hub_line: int | None = None
+        self.end_hub_line: int | None = None
+        self.nb_drones: int = 0
+        self.graph: Graph
 
     @staticmethod
     def strip_comment(line: str) -> str:
@@ -38,7 +40,7 @@ class Parser:
     def parse_file(self) -> None:
         try:
             with open(self.file_path, "r") as file:
-                lines = []
+                lines: list[tuple[int, str]] = []
                 for line_number, raw_line in enumerate(file, start=1):
                     content = self.strip_comment(raw_line)
                     if not content:
@@ -62,7 +64,7 @@ class Parser:
                 f"Line {first_line_number}: "
                 "nb_drones must be the first line of the file"
             )
-        contents_only = []
+        contents_only: list[str] = []
         for line_number, content in lines:
             contents_only.append(content)
         self.validate_required_fields(contents_only)
@@ -90,6 +92,8 @@ class Parser:
             self.zone_objects[self.end_hub_name].max_drones = self.nb_drones
 
     def validate_start_end_zone_types(self) -> None:
+        assert self.start_hub_name is not None
+        assert self.end_hub_name is not None
         start_hub = self.zone_objects[self.start_hub_name]
         end_hub = self.zone_objects[self.end_hub_name]
         if start_hub.zone_type == "blocked":
@@ -157,18 +161,18 @@ class Parser:
         if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid start_hub format")
         data = parts[1].strip()
-        metadata = None
+        metadata: str | None = None
         if data.endswith("]"):
             pos = data.rfind("[")
             if pos == -1:
                 raise ParserError("Invalid metadata format")
-            zone_data = data[:pos]
+            zone_data_str = data[:pos]
             metadata = data[pos + 1:-1]
             if metadata != metadata.strip():
                 raise ParserError("Invalid metadata format")
         else:
-            zone_data = data
-        zone_data = zone_data.strip().split()
+            zone_data_str = data
+        zone_data = zone_data_str.strip().split()
         if len(zone_data) != 3:
             raise ParserError("Invalid start_hub format")
         self.validate_zone_name(zone_data[0])
@@ -187,18 +191,18 @@ class Parser:
         if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid end_hub format")
         data = parts[1].strip()
-        metadata = None
+        metadata: str | None = None
         if data.endswith("]"):
             pos = data.rfind("[")
             if pos == -1:
                 raise ParserError("Invalid metadata format")
-            zone_data = data[:pos]
+            zone_data_str = data[:pos]
             metadata = data[pos + 1:-1]
             if metadata != metadata.strip():
                 raise ParserError("Invalid metadata format")
         else:
-            zone_data = data
-        zone_data = zone_data.strip().split()
+            zone_data_str = data
+        zone_data = zone_data_str.strip().split()
         if len(zone_data) != 3:
             raise ParserError("Invalid end_hub format")
         self.validate_zone_name(zone_data[0])
@@ -215,18 +219,18 @@ class Parser:
         if len(parts) != 2 or not parts[1].strip():
             raise ParserError("Invalid hub format")
         data = parts[1].strip()
-        metadata = None
+        metadata: str | None = None
         if data.endswith("]"):
             pos = data.rfind("[")
             if pos == -1:
                 raise ParserError("Invalid metadata format")
-            zone_data = data[:pos]
+            zone_data_str = data[:pos]
             metadata = data[pos + 1:-1]
             if metadata != metadata.strip():
                 raise ParserError("Invalid metadata format")
         else:
-            zone_data = data
-        zone_data = zone_data.strip().split()
+            zone_data_str = data
+        zone_data = zone_data_str.strip().split()
         if len(zone_data) != 3:
             raise ParserError("Invalid hub format")
         self.validate_zone_name(zone_data[0])
@@ -286,9 +290,9 @@ class Parser:
 
     def parse_zone_metadata(self, zone: Zone, metadata: str) -> None:
         allowed_names = ["zone", "color", "max_drones"]
-        seen_names = set()
+        seen_names: set[str] = set()
         metadata_parts = metadata.split()
-        for part in metadata:
+        for part in metadata_parts:
             if "=" not in part:
                 raise ParserError("Invalid metadata format")
             name, value = part.split("=", 1)
@@ -306,12 +310,12 @@ class Parser:
                 zone.color = self.validate_color(value)
             elif name == "max_drones":
                 try:
-                    value = int(value)
+                    max_drones_value = int(value)
                 except ValueError:
                     raise ParserError("Invalid max_drones value")
-                if value <= 0:
+                if max_drones_value <= 0:
                     raise ParserError("Invalid max_drones value")
-                zone.max_drones = value
+                zone.max_drones = max_drones_value
 
     def parse_connection_metadata(self, metadata: str) -> int:
         if not metadata.startswith("[") or not metadata.endswith("]"):
@@ -322,9 +326,9 @@ class Parser:
         parts = content.split("=")
         if len(parts) != 2:
             raise ParserError("Invalid metadata format")
-        max_link_capacity = parts[1]
+        max_link_capacity_str = parts[1]
         try:
-            max_link_capacity = int(max_link_capacity)
+            max_link_capacity = int(max_link_capacity_str)
         except ValueError:
             raise ParserError("Invalid max_link_capacity value")
         if max_link_capacity <= 0:
