@@ -3,7 +3,7 @@ from .graph import Graph
 
 class Pathfinder:
     def __init__(self, graph: Graph) -> None:
-        self.graph: = graph
+        self.graph: Graph = graph
 
     ZONE_COST = {
         "normal": 1,
