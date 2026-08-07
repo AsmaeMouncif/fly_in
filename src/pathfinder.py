@@ -1,6 +1,9 @@
+from .graph import Graph
+
+
 class Pathfinder:
-    def __init__(self, graph):
-        self.graph = graph
+    def __init__(self, graph: Graph) -> None:
+        self.graph: = graph
 
     ZONE_COST = {
         "normal": 1,
