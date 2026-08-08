@@ -9,15 +9,17 @@ import pygame  # noqa: E402
 
 class Visualizer:
     def __init__(self, graph, start_hub_name=None,
-                 end_hub_name=None, nb_drones=0, path=None):
+                 end_hub_name=None, nb_drones=0, paths=None):
         self.graph = graph
         self.start_hub_name = start_hub_name
         self.end_hub_name = end_hub_name
         self.nb_drones = nb_drones
-        if path:
-            self.path = path
+        if paths:
+            self.paths = paths
         else:
-            self.path = [start_hub_name]
+            self.paths = []
+            for _ in range(nb_drones):
+                self.paths.append([start_hub_name])
         self.last_move_time = 0
         self.zone_occupancy = {}
         for name in self.graph.zones:
@@ -26,11 +28,11 @@ class Visualizer:
         self.path_index = 0
         self.turn_count = 0
         self.drone_colors = []
-        for i in range(nb_drones):
+        for _ in range(nb_drones):
             color = random.choice(DRONE_COLORS)
             self.drone_colors.append(color)
         self.padding = 100
-        self.drones = [Drone(self.path, drone_id=i) for i in range(self.nb_drones)]
+        self.drones = [Drone(self.paths[i], drone_id=i) for i in range(self.nb_drones)]
         self.move_interval = 1500
         self.propeller_angle = 0
 
@@ -41,7 +43,7 @@ class Visualizer:
         self.zone_occupancy[self.start_hub_name] = self.nb_drones
         self.drones = []
         for i in range(self.nb_drones):
-            drone = Drone(self.path, drone_id=i)
+            drone = Drone(self.paths[i], drone_id=i)
             self.drones.append(drone)
         self.last_move_time = pygame.time.get_ticks()
         self.turn_count = 0

@@ -22,7 +22,7 @@ def main() -> None:
     assert parser.end_hub_name is not None
     zone_load: dict[str, int] = {}
     link_load: dict[int, int] = {}
-    paths = []
+    paths: list[list[str]] = []
     try:
         for _ in range(parser.nb_drones):
             _, predecessors = pathfinder.dijkstra_capacity_aware(
