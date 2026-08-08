@@ -20,6 +20,9 @@ def main() -> None:
     pathfinder = Pathfinder(parser.graph)
     assert parser.start_hub_name is not None
     assert parser.end_hub_name is not None
+    zone_load: dict[str, int] = {}
+    link_load: dict[int, int] = {}
+    paths = []
     _, predecessors = pathfinder.dijkstra(parser.start_hub_name)
     try:
         path = pathfinder.reconstruct_path(

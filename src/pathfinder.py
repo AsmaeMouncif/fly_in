@@ -42,6 +42,43 @@ class Pathfinder:
                     pq.append((new_distance, neighbor))
         return distances, predecessors
 
+    def dijkstra_capacity_aware(self, start, zone_load, link_load):
+        pq = []
+        distances = {}
+        predecessors = {}
+        for zone in self.graph.zones:
+            distances[zone] = float("inf")
+        distances[start] = 0
+        predecessors[start] = None
+        pq.append((0, start))
+        while pq:
+            min_zone = pq[0]
+            for item in pq:
+                if min_zone[0] > item[0]:
+                    min_zone = item
+            current_distance = min_zone[0]
+            current_zone = min_zone[1]
+            pq.remove(min_zone)
+            neighbors = self.graph.neighbors(current_zone)
+            for connection in neighbors:
+                neighbor = connection.find_other_end(current_zone)
+                neighbor_zone = self.graph.zones[neighbor]
+                if neighbor_zone.zone_type == "blocked":
+                    continue
+                base_cost = self.ZONE_COST[neighbor_zone.zone_type]
+                zone_congestion = zone_load.get(neighbor, 0) / neighbor_zone.max_drones
+                link_congestion = 0.0
+                if connection is not None:
+                    link_congestion = (
+                        link_load.get(id(connection), 0) / connection.max_link_capacity
+                    )
+                new_distance = current_distance + base_cost + zone_congestion + link_congestion
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    predecessors[neighbor] = current_zone
+                    pq.append((new_distance, neighbor))
+        return distances, predecessors
+
     def reconstruct_path(self, predecessors, start, end):
         path = []
         current = end
