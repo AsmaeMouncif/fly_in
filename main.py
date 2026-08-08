@@ -3,6 +3,9 @@ from src.parser import Parser, ParserError
 from src.pathfinder import Pathfinder
 from src.visualizer import Visualizer
 
+class SimulationError(Exception):
+    pass
+
 
 def main() -> None:
     if len(sys.argv) != 2:
@@ -21,6 +24,11 @@ def main() -> None:
     path = pathfinder.reconstruct_path(
         predecessors, parser.start_hub_name, parser.end_hub_name
     )
+    if path is None:
+        raise SimulationError(
+            f"No path found from '{parser.start_hub_name}' "
+            f"to '{parser.end_hub_name}'"
+        )
     visualizer = Visualizer(
         parser.graph, parser.start_hub_name,
         parser.end_hub_name, parser.nb_drones, path
@@ -29,4 +37,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SimulationError as e:
+        print(e)
+        sys.exit(1)
