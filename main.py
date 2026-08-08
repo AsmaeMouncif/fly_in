@@ -21,14 +21,18 @@ def main() -> None:
     assert parser.start_hub_name is not None
     assert parser.end_hub_name is not None
     _, predecessors = pathfinder.dijkstra(parser.start_hub_name)
-    path = pathfinder.reconstruct_path(
-        predecessors, parser.start_hub_name, parser.end_hub_name
-    )
-    if path is None:
-        raise SimulationError(
-            f"No path found from '{parser.start_hub_name}' "
-            f"to '{parser.end_hub_name}'"
+    try:
+        path = pathfinder.reconstruct_path(
+            predecessors, parser.start_hub_name, parser.end_hub_name
         )
+        if path is None:
+            raise SimulationError(
+                f"No path found from '{parser.start_hub_name}' "
+                f"to '{parser.end_hub_name}'"
+            )
+    except SimulationError as e:
+        print(e)
+        sys.exit(1)
     visualizer = Visualizer(
         parser.graph, parser.start_hub_name,
         parser.end_hub_name, parser.nb_drones, path
@@ -37,8 +41,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except SimulationError as e:
-        print(e)
-        sys.exit(1)
+    main()
