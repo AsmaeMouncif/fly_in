@@ -23,22 +23,31 @@ def main() -> None:
     zone_load: dict[str, int] = {}
     link_load: dict[int, int] = {}
     paths = []
-    _, predecessors = pathfinder.dijkstra(parser.start_hub_name)
     try:
-        path = pathfinder.reconstruct_path(
-            predecessors, parser.start_hub_name, parser.end_hub_name
-        )
-        if path is None:
-            raise SimulationError(
-                f"No path found from '{parser.start_hub_name}' "
-                f"to '{parser.end_hub_name}'"
+        for _ in range(parser.nb_drones):
+            _, predecessors = pathfinder.dijkstra_capacity_aware(
+                parser.start_hub_name, zone_load, link_load
             )
+            path = pathfinder.reconstruct_path(
+                predecessors, parser.start_hub_name, parser.end_hub_name
+            )
+            if path is None:
+                raise SimulationError(
+                    f"No path found from '{parser.start_hub_name}' "
+                    f"to '{parser.end_hub_name}'"
+                )
+            paths.append(path)
+            for i in range(len(path) - 1):
+                zone_load[path[i + 1]] = zone_load.get(path[i + 1], 0) + 1
+                connection = parser.graph.get_connection(path[i], path[i + 1])
+                if connection is not None:
+                    link_load[id(connection)] = link_load.get(id(connection), 0) + 1
     except SimulationError as e:
         print(e)
         sys.exit(1)
     visualizer = Visualizer(
         parser.graph, parser.start_hub_name,
-        parser.end_hub_name, parser.nb_drones, path
+        parser.end_hub_name, parser.nb_drones, paths
     )
     visualizer.run()
 
