@@ -1,0 +1,82 @@
+from .graph import Graph
+
+
+class Pathfinder:
+    def __init__(self, graph: Graph) -> None:
+        self.graph: Graph = graph
+
+    ZONE_COST = {
+        "normal": 1,
+        "priority": 0.9,
+        "restricted": 2,
+    }
+
+    def dijkstra(self, start, blocked_zones=None, blocked_connections=None):
+        if blocked_zones is None:
+            blocked_zones = set()
+        if blocked_connections is None:
+            blocked_connections = set()
+        pq = []
+        distances = {}
+        predecessors = {}
+        for zone in self.graph.zones:
+            distances[zone] = float("inf")
+        distances[start] = 0
+        predecessors[start] = None
+        pq.append((0, start))
+        while pq:
+            min_zone = pq[0]
+            for item in pq:
+                if min_zone[0] > item[0]:
+                    min_zone = item
+            current_distance = min_zone[0]
+            current_zone = min_zone[1]
+            pq.remove(min_zone)
+            neighbors = self.graph.neighbors(current_zone)
+            for connection in neighbors:
+                neighbor = connection.find_other_end(current_zone)
+                neighbor_zone = self.graph.zones[neighbor]
+                if neighbor_zone.zone_type == "blocked":
+                    continue
+                if neighbor in blocked_zones and neighbor != start:
+                    continue
+                if id(connection) in blocked_connections:
+                    continue
+                distance = self.ZONE_COST[neighbor_zone.zone_type]
+                new_distance = current_distance + distance
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    predecessors[neighbor] = current_zone
+                    pq.append((new_distance, neighbor))
+        return distances, predecessors
+
+    def reconstruct_path(self, predecessors, start, end):
+        path = []
+        current = end
+        while current is not None:
+            path.append(current)
+            current = predecessors.get(current)
+        path.reverse()
+        if not path or path[0] != start:
+            return None
+        return path
+
+    def path_cost(self, path):
+        total = 0
+        for zone_name in path[1:]:
+            zone = self.graph.zones[zone_name]
+            total += self.ZONE_COST[zone.zone_type]
+        return total
+
+    def k_shortest_paths(self, start, end, k):
+        _, predecessors = self.dijkstra(start)
+        first_path = self.reconstruct_path(predecessors, start, end)
+        if first_path is None:
+            return []
+        found_paths = [first_path]
+        candidates = []
+        while len(found_paths) < k:
+            previous_path = found_paths[-1]
+            for i in range(len(previous_path) - 1):
+                spur_node = previous_path[i]
+        return found_paths
